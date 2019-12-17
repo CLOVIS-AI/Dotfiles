@@ -1,0 +1,11 @@
+parse_git_branch() {
+    RES=$(git for-each-ref --format="%(refname:short) %(push:track)" refs/heads/$(git rev-parse --abbrev-ref HEAD 2>/dev/null) 2>/dev/null | sed 's/[[:space:]]*$//')
+    if [[ $RES = "" ]]
+    then
+        git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/' -e 's/^[[:space:]]*//'
+    else
+        echo $RES" "
+    fi
+}
+
+export PS1="\[\033[48;5;232m[ \[\033[94m\]\u@\h \[\033[32m\]\W \[\033[33m\]\$(parse_git_branch)\[\033[39m]\[\033[00m\] $ "

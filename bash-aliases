@@ -1,0 +1,16 @@
+#
+# .bash_aliases
+#
+
+# ls
+alias ls='ls --color=auto'
+alias la='ls -a --color=auto'
+alias ll='ls -l --color=auto'
+alias lla='ls -la --color=auto'
+
+# editor
+alias edit='emacs -nw'
+
+# grep
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
