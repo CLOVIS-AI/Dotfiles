@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ $# = 0 ]]
+then
+	ssh -At icanet@ssh.enseirb-matmeca.fr ssh travail64
+else
+	ssh -At icanet@ssh.enseirb-matmeca.fr "ssh $1"
+fi

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+announce "RAM usage: $ free -h"
+free -h
+
+announce "HDD speed: $ hdparm -t /dev/sda"
+sudo hdparm -t /dev/sda
+
+announce "USB device tree: $ lsusb -t"
+lsusb -t
+
+announce "PCI device tree: $ lspci -tv"
+lspci -tv

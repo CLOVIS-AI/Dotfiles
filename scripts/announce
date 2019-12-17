@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [[ $1 = "-n" ]]
+then
+    echo
+    shift
+fi
+
+if [[ $1 = "-r" ]]
+then
+    echo -ne "\033[2K\r"
+    shift
+fi
+
+if [[ $1 = "-nn" ]]
+then
+    PARAMS="-n"
+    shift
+fi
+
+echo -e $PARAMS "\e[48;5;232m[ \e[94m${USER}@${HOSTNAME}\e[39m ]\e[0m\e[48;5;233m $* \e[0m"

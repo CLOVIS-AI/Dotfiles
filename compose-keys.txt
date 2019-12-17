@@ -1,0 +1,42 @@
+Main                                Symbols
+·   ALT-GR 9 .                      ♩   # q
+•   . =                             ♪   # e
+œ   o e                             ♫   # E
+                                    ♬   # S
+Punctuation                         ♭   # b
+ń   ' n                             ♮   # f
+ǹ   ` n                             ♯   # #
+…   . .                             ♥   < 3
+Em-dash: 6 6 6                      ←   < -
+En-dash: 6 6 .                      →   - >
+«   < <                             ☭   C C C P
+»   > >
+‘   ' <                             Circled stuff
+’   ' >                             ②   ( 2 )
+Non-breaking space: space space     ¿   ? ?
+                                    ¡   ! !
+Currency                            ⁵   ^ 5 (sans compose)
+€   e =                             ₅   _ 5 (avec compose)
+¥   y =
+£   l -
+¢   c /
+
+Mathematics
+•   . =
+≡   = _
+∞   8 8
+≤   < =
+≥   > =
+µ   u /
+×   x x
+≠   / =
+¬   , -
+√   v /
+
+Legal
+™   t m
+©   o c
+®   o r
+
+
+
