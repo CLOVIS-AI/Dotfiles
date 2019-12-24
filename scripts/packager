@@ -14,11 +14,12 @@ function remotes {
         rm -i ~/.config/packager/remotes
         ;;
     do)
+        shift
         for remote in $(cat ~/.config/packager/remotes)
         do
-            announce "Connecting to $remote..."
-            ssh -At $remote packager $*
-        done;;
+            ssh -At $remote "packager $*"
+        done
+        packager $*;;
     *)
         announce "Unknown operation '$1'."
         exit 2
