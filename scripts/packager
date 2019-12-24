@@ -1,0 +1,111 @@
+#!/bin/bash
+
+OPERATION=""
+
+function remotes {
+    case $1 in
+    register|add)
+        announce "Registering machine $2"
+        mkdir -p ~/.config/packager
+        echo $2 >> ~/.config/packager/remotes
+        ;;
+    clear)
+        announce "Removing all remotes"
+        rm -i ~/.config/packager/remotes
+        ;;
+    do)
+        for remote in $(cat ~/.config/packager/remotes)
+        do
+            announce "Connecting to $remote..."
+            ssh -At $remote packager $*
+        done;;
+    *)
+        announce "Unknown operation '$1'."
+        exit 2
+    esac
+}
+
+case $1 in
+install|-S)
+    OPERATION="install";;
+delete|remove|-R)
+    OPERATION="remove";;
+upgrade)
+    OPERATION="upgrade";;
+remote|-r)
+    shift
+    remotes $*
+    exit 0;;
+*)
+    announce "Unknown operation '$1'."
+    exit 1
+esac
+shift
+
+function yay-install {
+    announce "yay -S --needed $*"
+    yay -S --needed --confirm $*
+}
+
+function yay-remove {
+    announce "yay -Rncs $*"
+    yay -Rncs --confirm $*
+}
+
+function yay-upgrade {
+    announce "yay -Syyuu"
+    yay -Syyuu --confirm
+}
+
+function aptitude-install {
+    announce "aptitude install $*"
+    sudo aptitude install $*
+}
+
+function aptitude-remove {
+    announce "aptitude remove $*"
+    sudo aptitude remove $*
+}
+
+function aptitude-upgrade {
+    announce "aptitude update"
+    sudo aptitude update
+    
+    announce "aptitude upgrade"
+    sudo aptitude upgrade
+}
+
+function apt-install {
+    announce "apt install $*"
+    sudo apt install $*
+}
+
+function apt-remove {
+    announce "apt remove $*"
+    sudo apt remove $*
+}
+
+function apt-upgrade {
+    announce "apt update"
+    sudo apt update
+    
+    announce "apt upgrade"
+    sudo apt upgrade
+}
+
+if hash aptitude 2>/dev/null
+then
+    aptitude-$OPERATION $*
+else
+    if hash yay 2>/dev/null
+    then
+        yay-$OPERATION $*
+    else
+        if hash apt-get 2>/dev/null
+        then
+            apt-$OPERATION $*
+        else
+            announce "Couldn't find package manager..."
+        fi
+    fi
+fi
