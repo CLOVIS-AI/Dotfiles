@@ -15,46 +15,46 @@ function classic {
 
 function angular {
     announce "Choose the type:"
-    echo "0. build — build system, dependencies"
-    echo "1. ci — CI/CD"
-    echo "2. docs — documentation changes (internal or public)"
-    echo "3. feat — new features, backward-compatible"
-    echo "4. fix — fix problems, backward-compatible"
-    echo "5. perf — better performances, backward-compatible"
-    echo "6. refactor — changes to the product, backward-compatible"
-    echo "7. style — grammar, coding style, linting..."
-    echo "8. test — new tests, refactoring tests..."
-    echo "9. breaking — backward-incompatible changes"
+    echo "0. build      build system, dependencies"
+    echo "1. ci         CI/CD"
+    echo "2. docs       documentation changes (internal or public)"
+    echo "3. feat       new features, backward-compatible"
+    echo "4. fix        fix problems, backward-compatible"
+    echo "5. perf       better performances, backward-compatible"
+    echo "6. refactor   changes to the product, backward-compatible"
+    echo "7. style      grammar, coding style, linting..."
+    echo "8. test       new tests, refactoring tests..."
+    echo "9. breaking   backward-incompatible changes"
     announce -nn "Your choice:"
     read -r CHOICE_TYPE
 
     case $CHOICE_TYPE in
-    0)
+    0|build)
         TYPE=build;;
-    1)
+    1|ci)
         TYPE=ci;;
-    2)
+    2|docs)
         TYPE=docs;;
-    3)
+    3|feat)
         TYPE=feat;;
-    4)
+    4|fix)
         TYPE=fix;;
-    5)
+    5|perf)
         TYPE=perf;;
-    6)
+    6|refactor)
         TYPE=refactor;;
-    7)
+    7|style)
         TYPE=style;;
-    8)
+    8|test)
         TYPE=test;;
-    9)
+    9|breaking)
         TYPE=breaking;;
     *)
         echo "Wrong input."
         angular;;
     esac
 
-    announce -nn "Scope of the commit (can be empty for top-level):"
+    announce -nn "Scope of the commit:"
     read -r SCOPE
 
     announce -nn "Commit message:"
