@@ -15,16 +15,16 @@ function classic {
 
 function angular {
     announce "Choose the type:"
-    echo "0. build      build system, dependencies"
-    echo "1. ci         CI/CD"
-    echo "2. docs       documentation changes (internal or public)"
-    echo "3. feat       new features, backward-compatible"
-    echo "4. fix        fix problems, backward-compatible"
-    echo "5. perf       better performances, backward-compatible"
-    echo "6. refactor   changes to the product, backward-compatible"
-    echo "7. style      grammar, coding style, linting..."
-    echo "8. test       new tests, refactoring tests..."
-    echo "9. breaking   backward-incompatible changes"
+    echo " 0. build      build system, dependencies"
+    echo " 1. ci         CI/CD"
+    echo " 2. docs       documentation changes (internal or public)"
+    echo " 3. feat       new features, backward-compatible"
+    echo " 4. fix        fix problems, backward-compatible"
+    echo " 5. perf       better performances, backward-compatible"
+    echo " 6. refactor   changes to the product, backward-compatible"
+    echo " 7. style      grammar, coding style, linting..."
+    echo " 8. test       new tests, refactoring tests..."
+    echo " 9. breaking   backward-incompatible changes"
     announce -nn "Your choice:"
     read -r CHOICE_TYPE
 
