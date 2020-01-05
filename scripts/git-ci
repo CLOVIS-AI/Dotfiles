@@ -1,8 +1,8 @@
 #!/bin/bash
 
 announce "Choose your style:"
-echo 0. Classic
-echo 1. Angular
+echo " 0. Classic"
+echo " 1. Angular"
 announce -nn "Your choice:"
 read -r STYLE
 
