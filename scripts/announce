@@ -18,4 +18,4 @@ then
     shift
 fi
 
-echo -e $PARAMS "\e[48;5;232m[ \e[94m${USER}@${HOSTNAME}\e[39m ]\e[0m\e[48;5;233m $* \e[0m"
+echo -e $PARAMS "\e[48;5;16m[ \e[94m${USER}@${HOSTNAME}\e[39m ]\e[0m\e[48;5;233m $* \e[0m"
