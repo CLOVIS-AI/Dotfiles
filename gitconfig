@@ -23,7 +23,7 @@
         cm = commit -m
         a = add
         ap = add -p
-        add-new-files = add --intent-to-add
+        add-new-files = add --intent-to-add .
         f = fetch -p
         fr = "!for r in $(git remote); do announce \"Fetching\" $r; git f $r; done"
         b = branch
