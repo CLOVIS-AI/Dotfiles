@@ -85,17 +85,21 @@ function merge {
         esac
     fi
 
-    announce " $ git merge $OPTIONS $TARGET"
+    announce "git merge $OPTIONS $TARGET"
     git merge $OPTIONS $TARGET
 }
 
 function rebase {
-    announce " $ git rebase $TARGET"
-    git rebase $TARGET
+    announce "git rebase --interactive $TARGET"
+    git rebase -i $TARGET
+    announce "git checkout $TARGET"
+    git checkout $TARGET
+    announce "git merge --ff-only $TARGET"
+    git merge --ff-only $TARGET
 }
 
 function squash {
-    announce " $ git merge --stat --squash $TARGET"
+    announce "git merge --stat --squash $TARGET"
     git merge --stat --squash $TARGET
 }
 
