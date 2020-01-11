@@ -104,11 +104,11 @@ function eslint {
     
     announce -nn "Fixes (optional):"
     read -r FIX
-    MESSAGE+=" (fixes $FIX)"
+    [[ $FIX != "" ]] && MESSAGE+=" (fixes $FIX)"
     
     announce -nn "References (optional):"
     read -r REF
-    MESSAGE+=" (refs $REF)"
+    [[ $REF != "" ]] && MESSAGE+=" (refs $REF)"
 
     git commit -m "$TYPE: $MESSAGE"
 }
