@@ -1,0 +1,29 @@
+#!/bin/bash
+
+case $1 in
+enabled)
+    hash yay || (echo "'yay' is not installed."; exit 1)
+    ;;
+name)
+    echo -n "yay"
+    ;;
+install)
+    shift
+    announce "yay -S --needed $*"
+    yay -S --needed $*
+    ;;
+upgrade)
+    shift
+    announce "yay -Syyuu $*"
+    yay -Syyuu $*
+    ;;
+remove)
+    shift
+    announce "yay -Rncs $*"
+    yay -Rncs --confirm $*
+    ;;
+*)
+    announce "Invalid command '$1'."
+    exit 2
+    ;;
+esac

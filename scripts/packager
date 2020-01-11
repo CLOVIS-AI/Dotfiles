@@ -1,112 +1,124 @@
 #!/bin/bash
 
-OPERATION=""
+#
+# 'Packager' is a wrapper around many tools that are able to install/upgrade packages.
+#
+# It is created in order to be as easy as possible to extend to support more tools.
+#
+# To add support to a new tool, follow this procedure:
+# - Create a script called 'packager-[name of your tool here, can be anything]', and add it to your PATH.
+# - Your script should accept all the commands explained below.
+#
+# COMMANDS of packager tools.
+#
+# enabled
+#   Should exit with an error code of 0 if your tool can be used (is installed on this machine...), or any other code if your tool cannot be used.
+#   If the tool cannot be used, should display an explanation in the standard output..
+#
+# name
+#   Should print the display-name of your tool (eg. 'git'), without trailing end-of-line character (eg. by using 'echo -n your-name').
+#
+# install [package1] [package2] [...]
+#   Should install the given packages.
+#
+# upgrade
+#   Should upgrade all installed packages.
+#
+# upgrade [package1] [package2] [...]
+#   Should upgrade only the selected packages.
+#
+# remove [package1] [package2] [...]
+#   Should completely remove the selected packages.
+#
+# You can implement any other command you'd like, if needed. Wrappers are allowed to add their own interactive processes (eg. to ask for confirmation...). For example, it is possible to have a wrapper that asks the user whether 'sudo' should be used or not.
+#
 
-function remotes {
+# ======================================== V E R B O S I T Y ========================================== #
+
+VERBOSE=0
+if [[ $1 = "-v" ]]
+then
+    VERBOSE=1
+    shift
+fi
+
+function debug {
+    [[ $VERBOSE = 1 ]] && echo "debug: $*"
+}
+
+# ========================================== L O A D I N G ============================================ #
+
+function test-dependency {
+    hash $1 || (announce "Missing dependency: '$1'"; MISSING=1)
+}
+
+debug "Checking for installation of dependencies..."
+hash announce || (echo "Missing dependency: 'announce' (from clovis-ai/dotfiles)"; MISSING=1)
+test-dependency compgen
+debug "All dependencies checked."
+if [[ $MISSING = 1 ]]
+then
+    echo "Failed because of missing dependencies."
+    exit 1
+fi
+
+# ============================================ E X E C ================================================ #
+
+function find-tools {
+    for tool in $(compgen -A command "packager-") $(compgen -A function "packager-")
+    do
+        debug "Tool $tool found."
+        if $tool enabled >/dev/null
+        then
+            debug "Tool $tool is enabled."
+            TOOLS+=($tool)
+        else
+            debug "Tool $tool is disabled (if this is abnormal, run '$tool enabled' to get more information.)."
+        fi
+    done
+}
+
+function select-tool {
+    announce "Choose your tool:"
+    INDEX=0
+    for tool in "${TOOLS[@]}"
+    do
+        echo -en " $INDEX. "
+        $tool name
+        echo
+        let INDEX++
+    done
+    
+    announce -nn "Your choice:"
+    read CHOICE
+    
+    TOOL=${TOOLS[$CHOICE]}
+    debug "Selected tool: '$TOOL'."
+}
+
+declare -a TOOLS
+find-tools
+select-tool
+
+function find-command {
     case $1 in
-    register|add)
-        announce "Registering machine $2"
-        mkdir -p ~/.config/packager
-        echo $2 >> ~/.config/packager/remotes
+    install|i)
+        COMMAND=install
         ;;
-    clear)
-        announce "Removing all remotes"
-        rm -i ~/.config/packager/remotes
+    upgrade|u)
+        COMMAND=upgrade
         ;;
-    do)
-        shift
-        for remote in $(cat ~/.config/packager/remotes)
-        do
-            ssh -At $remote "packager $*"
-        done
-        packager $*;;
+    remove|r)
+        COMMAND=remove
+        ;;
     *)
-        announce "Unknown operation '$1'."
+        announce "Unknown command '$1'."
         exit 2
+        ;;
     esac
 }
 
-case $1 in
-install|-S)
-    OPERATION="install";;
-delete|remove|-R)
-    OPERATION="remove";;
-upgrade)
-    OPERATION="upgrade";;
-remote|-r)
-    shift
-    remotes $*
-    exit 0;;
-*)
-    announce "Unknown operation '$1'."
-    exit 1
-esac
+find-command $1
 shift
 
-function yay-install {
-    announce "yay -S --needed $*"
-    yay -S --needed --confirm $*
-}
-
-function yay-remove {
-    announce "yay -Rncs $*"
-    yay -Rncs --confirm $*
-}
-
-function yay-upgrade {
-    announce "yay -Syyuu"
-    yay -Syyuu --confirm
-}
-
-function aptitude-install {
-    announce "aptitude install $*"
-    sudo aptitude install $*
-}
-
-function aptitude-remove {
-    announce "aptitude remove $*"
-    sudo aptitude remove $*
-}
-
-function aptitude-upgrade {
-    announce "aptitude update"
-    sudo aptitude update
-    
-    announce "aptitude upgrade"
-    sudo aptitude upgrade
-}
-
-function apt-install {
-    announce "apt install $*"
-    sudo apt install $*
-}
-
-function apt-remove {
-    announce "apt remove $*"
-    sudo apt remove $*
-}
-
-function apt-upgrade {
-    announce "apt update"
-    sudo apt update
-    
-    announce "apt upgrade"
-    sudo apt upgrade
-}
-
-if hash aptitude 2>/dev/null
-then
-    aptitude-$OPERATION $*
-else
-    if hash yay 2>/dev/null
-    then
-        yay-$OPERATION $*
-    else
-        if hash apt-get 2>/dev/null
-        then
-            apt-$OPERATION $*
-        else
-            announce "Couldn't find package manager..."
-        fi
-    fi
-fi
+$TOOL $COMMAND $*

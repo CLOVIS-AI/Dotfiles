@@ -1,0 +1,29 @@
+#!/bin/bash
+
+case $1 in
+enabled)
+    hash pacman || (echo "'pacman' is not installed."; exit 1)
+    ;;
+name)
+    echo -n "pacman"
+    ;;
+install)
+    shift
+    announce "pacman -S --needed $*"
+    sudo pacman -S --needed $*
+    ;;
+upgrade)
+    shift
+    announce "pacman -Syyuu $*"
+    sudo pacman -Syyuu $*
+    ;;
+remove)
+    shift
+    announce "pacman -Rncs $*"
+    pacman -Rncs --confirm $*
+    ;;
+*)
+    announce "Invalid command '$1'."
+    exit 2
+    ;;
+esac
