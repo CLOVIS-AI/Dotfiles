@@ -10,9 +10,12 @@ Clone the repository in `~/config`:
 
 ### .bashrc
 
-Add the following line to your `.bashrc`.
+Choose what you want, and add it to your `.bashrc`:
 
-    . ~/config/bashrc
+    . ~/config/bash-aliases # My custom aliases
+    . ~/config/bash-prompt  # My custom prompt
+    . ~/config/bash-path    # Adds the scripts in scripts/ to your path
+    . ~/config/bashrc       # All of the above
 
 ### Git config
 

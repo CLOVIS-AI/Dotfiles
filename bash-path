@@ -1,0 +1,5 @@
+#
+# Adds the path to the different scripts I'm using in the scripts/ repertory.
+#
+
+PATH=$PATH:$HOME/config/scripts

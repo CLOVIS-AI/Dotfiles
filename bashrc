@@ -9,4 +9,4 @@
 . $HOME/config/bash-aliases
 
 # Adding the scripts to the path
-PATH=$PATH:$HOME/config/scripts
+. $HOME/config/bash-path
