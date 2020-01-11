@@ -28,7 +28,10 @@
 #   Should upgrade only the selected packages.
 #
 # remove [package1] [package2] [...]
-#   Should completely remove the selected packages.
+#   Should remove the selected packages, but (if applicable), keep their dependencies and configuration.
+#
+# purge [package1] [package2] [...]
+#   Should completely remove the package, any uneeded dependencies, and configuration files.
 #
 # You can implement any other command you'd like, if needed. Wrappers are allowed to add their own interactive processes (eg. to ask for confirmation...). For example, it is possible to have a wrapper that asks the user whether 'sudo' should be used or not.
 #
@@ -108,8 +111,24 @@ function find-command {
     upgrade|u)
         COMMAND=upgrade
         ;;
-    remove|r)
-        COMMAND=remove
+    remove|r|purge|p)
+        announce "Are you sure you want to completely remove the packages?"
+        echo " y. Yes, delete everything, including uneeded dependencies and configuration."
+        echo " r. No, remove the packages but keep the dependencies and configuration."
+        echo " n. No, don't do anything."
+        announce "Your choice (y/r/N):"
+        read CHOICE
+        case $CHOICE in
+        y|yes|p|purge)
+            COMMAND=purge
+            ;;
+        r|remove)
+            COMMAND=remove
+            ;;
+        *)
+            announce "Stopping."
+            exit 0;;
+        esac
         ;;
     *)
         announce "Unknown command '$1'."

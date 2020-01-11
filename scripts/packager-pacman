@@ -2,7 +2,7 @@
 
 case $1 in
 enabled)
-    hash pacman || (echo "'pacman' is not installed."; exit 1)
+    hash pacman 2>/dev/null || (echo "'pacman' is not installed."; exit 1)
     ;;
 name)
     echo -n "pacman"
@@ -19,8 +19,13 @@ upgrade)
     ;;
 remove)
     shift
+    announce "pacman -R $*"
+    sudo pacman -R --confirm $*
+    ;;
+purge)
+    shift
     announce "pacman -Rncs $*"
-    pacman -Rncs --confirm $*
+    sudo pacman -Rncs --confirm $*
     ;;
 *)
     announce "Invalid command '$1'."
