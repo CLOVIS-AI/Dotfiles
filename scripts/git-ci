@@ -55,6 +55,9 @@ function angular {
         angular;;
     esac
 
+    announce "Last used scopes:"
+    for i in $(git log --oneline --abbrev-commit | cut -d ' ' -f 1 --complement | grep --color=auto -E '^(build|ci|docs|feat|fix|perf|refactor|style|test|breaking)\(.*\)' | sed -r -e 's/\).*$//' -e 's/^.*\(//'| awk '!x[$0]++' | head -10)
+    do echo " -  $i"; done
     announce -nn "Scope of the commit:"
     read -r SCOPE
 
