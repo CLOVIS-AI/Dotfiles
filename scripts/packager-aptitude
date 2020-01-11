@@ -1,0 +1,42 @@
+#!/bin/bash
+
+case $1 in
+enabled)
+    hash aptitude 2>/dev/null || (echo "'aptitude' is not installed."; exit 1)
+    ;;
+name)
+    echo -n "aptitude"
+    ;;
+install)
+    shift
+    announce "aptitude install $*"
+    sudo aptitude install $*
+    ;;
+upgrade)
+    shift
+    if [[ $# = 0 ]]
+    then
+        announce "aptitude update"
+        sudo aptitude update
+        announce "aptitude safe-upgrade"
+        sudo aptitude safe-upgrade
+    else
+        announce "Cannot upgrade only selected packages."
+        exit 1
+    fi
+    ;;
+purge)
+    shift
+    announce "aptitude purge $*"
+    sudo aptitude purge $*
+    ;;
+remove)
+    shift
+    announce "aptitude remove $*"
+    sudo apt remove $*
+    ;;
+*)
+    announce "Invalid command '$1'."
+    exit 2
+    ;;
+esac
