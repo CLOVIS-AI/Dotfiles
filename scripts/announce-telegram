@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [[ $# != 2 ]]
+then
+    announce "Expected 2 arguments, a file with the message, and a file with the list of chats."
+    exit 1
+fi
+
+if [[ ! -f $1 ]]
+then
+    announce "File $1 doesn't exist."
+    exit 1
+fi
+
+if [[ ! -f $2 ]]
+then
+    announce "File $2 doesn't exist."
+    exit 1
+fi
+
+if [[ ${BOT_TOKEN:-undefined} == undefined ]]
+then
+    announce "Missing BOT_TOKEN"
+    exit 1
+fi
+
+announce "Sending message to the $(<$2 wc -w) chats found."
+echo "START OF MESSAGE"
+cat $1
+echo "END OF MESSAGE"
+
+for CHAT_ID in $(cat $2)
+do
+    echo "Sending to $CHAT_ID"
+    curl -v\
+        --data-urlencode "parse_mode=html" \
+        --data-urlencode "chat_id=${CHAT_ID}" \
+        --data-urlencode "text=$(cat $1)" \
+        "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage"
+done
