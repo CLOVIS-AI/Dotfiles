@@ -1,0 +1,16 @@
+#!/bin/bash
+
+announce "Sending message to the $(<$2 wc -w) chats found."
+echo "START OF MESSAGE"
+echo -e $1
+echo "END OF MESSAGE"
+
+for CHAT_ID in $(cat $2)
+do
+    echo "Sending to $CHAT_ID"
+    curl -v\
+        --data-urlencode "parse_mode=markdown" \
+        --data-urlencode "chat_id=${CHAT_ID}" \
+        --data-urlencode "text=$(echo -e $1)" \
+        "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage"
+done
