@@ -2,11 +2,13 @@
 # .bashrc
 #
 
+CONFIG=${CLOVIS_CONFIG:-$HOME/config}
+
 # Custom bash prompt
-. $HOME/config/bash-prompt
+. $CONFIG/bash-prompt
 
 # Aliases
-. $HOME/config/bash-aliases
+. $CONFIG/bash-aliases
 
 # Adding the scripts to the path
-. $HOME/config/bash-path
+. $CONFIG/bash-path
