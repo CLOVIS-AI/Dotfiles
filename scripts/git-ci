@@ -8,7 +8,7 @@ announce -nn "Your choice:"
 read -r STYLE
 
 function classic {
-    announce -nn "Choose your commit message:"
+    announce -nn "What did you do?"
     read -r MSG
 
     git commit -m "$MSG"
@@ -61,7 +61,7 @@ function angular {
     announce -nn "Scope of the commit:"
     read -r SCOPE
 
-    announce -nn "Commit message:"
+    announce -nn "What did you do?"
     read -r MESSAGE
 
     git commit -m "$TYPE($SCOPE): $MESSAGE"
@@ -99,7 +99,7 @@ function eslint {
         eslint;;
     esac
 
-    announce -nn "Commit message:"
+    announce -nn "What did you do?"
     read -r MESSAGE
     
     announce -nn "Fixes (optional):"
