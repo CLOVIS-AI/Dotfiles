@@ -33,7 +33,7 @@ for CHAT_ID in $(cat $2)
 do
     echo "Sending to $CHAT_ID"
     curl -v\
-        --data-urlencode "parse_mode=markdown" \
+        --data-urlencode "parse_mode=html" \
         --data-urlencode "chat_id=${CHAT_ID}" \
         --data-urlencode "text=$(cat $1)" \
         "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage"

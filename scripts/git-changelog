@@ -54,13 +54,26 @@ function display {
     telegram-markdown)
         case $1 in
         title)
-            echo "**$2**"
+            echo "*$2*"
             ;;
         text)
             echo $2
             ;;
         item)
             echo "- $2"
+            ;;
+        esac
+        ;;
+    telegram-html)
+        case $1 in
+        title)
+            echo "<strong>$2</strong>"
+            ;;
+        text)
+            echo $2
+            ;;
+        item)
+            echo " • $2"
             ;;
         esac
         ;;

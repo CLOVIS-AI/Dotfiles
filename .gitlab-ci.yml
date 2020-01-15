@@ -15,6 +15,6 @@ telegram:
   stage: announce
   image: registry.gitlab.com/clovis-ai/dotfiles
   script:
-    - git changelog --format telegram-markdown --since yesterday >chlog
+    - git changelog --format telegram-html --since yesterday >chlog
     - announce-telegram chlog "$CHAT_IDS"
 
