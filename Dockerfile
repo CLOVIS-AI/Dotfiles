@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-RUN apk --no-cache --update add git openssh curl bash
+RUN apk --no-cache --update add git openssh curl bash coreutils
 
 SHELL ["/bin/bash", "-c"]
 
