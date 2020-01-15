@@ -19,5 +19,5 @@ telegram:
   image: registry.gitlab.com/clovis-ai/dotfiles
   script:
     - git changelog --format telegram-markdown --since yesterday >>changelog
-    - announce-telegram "$(cat changelog)" "$CHAT_IDS"
+    - announce telegram "$(cat changelog)" "$CHAT_IDS"
 

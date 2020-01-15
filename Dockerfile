@@ -1,10 +1,11 @@
 FROM alpine:latest
 
+RUN apk --no-cache --update add git openssh curl bash
+
+SHELL ["/bin/bash", "-c"]
+
 # Copying this repo to the Docker image.
 COPY . /root/config
 
-# Sourcing the environnement variable, to get the correct PATH to be able to call commands.
-RUN source ~/config/bashrc
-
-# Install Git and Wget
-RUN apk --no-cache --update add git openssh curl
+# Add the scripts to the PATH.
+ENV PATH /root/config/scripts:$PATH
