@@ -1,5 +1,6 @@
 stages:
   - docker
+  - announce
 
 build-docker:
   stage: docker
@@ -12,3 +13,11 @@ build-docker:
   only:
     - master
     - tags
+
+telegram:
+  stage: announce
+  image: registry.gitlab.com/clovis-ai/dotfiles
+  script:
+    - git changelog --format telegram-markdown --since yesterday >>changelog
+    - announce-telegram "$(cat changelog)" "$CHAT_IDS"
+

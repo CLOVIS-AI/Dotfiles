@@ -69,7 +69,7 @@ function display {
         exit 1
     esac
 }
-[[ $1 != "--no-title" ]] && display title "Changelog" || shift
+[[ $1 != "--no-title" ]] && display title "Changelog${CI_PROJECT_TITLE+" of "}${CI_PROJECT_TITLE}" || shift
 
 # === LOGIC ===
 
@@ -152,6 +152,7 @@ function find-commit {
     classify $2 "$1" "Unsorted" ""
 }
 
+[[ $# != 0 ]] && display text "Git options: $*"
 COMMITS=$(git log --pretty=format:'%h' $*)
 
 function create {
