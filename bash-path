@@ -2,4 +2,6 @@
 # Adds the path to the different scripts I'm using in the scripts/ repertory.
 #
 
-PATH=$PATH:$HOME/config/scripts
+CONFIG=${CLOVIS_CONFIG:-$HOME/config}
+
+PATH=$PATH:$CONFIG/scripts

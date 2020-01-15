@@ -5,4 +5,4 @@ git log \
     --graph \
     --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an> %CredSIG:%G?%GS%Creset' \
     --abbrev-commit \
-    $* | sed -f ~/config/sed-git-log.sed | less -rFX
+    $* | sed -f ${CLOVIS_CONFIG:-$HOME/config}/sed-git-log.sed | less -rFX
