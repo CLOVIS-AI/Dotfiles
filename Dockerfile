@@ -7,4 +7,4 @@ COPY . /root/config
 RUN source ~/config/bashrc
 
 # Install Git and Wget
-RUN apk --no-cache --update add git openssh
+RUN apk --no-cache --update add git openssh curl
