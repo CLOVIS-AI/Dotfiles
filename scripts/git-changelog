@@ -99,11 +99,11 @@ function classify {
 }
 
 function angular-clean {
-    echo $* | sed -r 's/^(chore|build|docs|feat|fix|perf|refactor|style|test|breaking)(.*): //'
+    echo $* | sed -r 's/^(chore|build|docs|feat|fix|perf|refactor|style|test|breaking|ci)(.*): //'
 }
 
 function angular-scope {
-    echo $* | sed -r -e 's/^(chore|build|docs|feat|fix|perf|refactor|style|test|breaking)\(//' -e 's/\).*$//'
+    echo $* | sed -r -e 's/^(chore|build|docs|feat|fix|perf|refactor|style|test|breaking|ci)\(//' -e 's/\).*$//'
 }
 
 function eslint-clean {
