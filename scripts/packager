@@ -36,6 +36,42 @@
 # You can implement any other command you'd like, if needed. Wrappers are allowed to add their own interactive processes (eg. to ask for confirmation...). For example, it is possible to have a wrapper that asks the user whether 'sudo' should be used or not.
 #
 
+# ============================================= H E L P =============================================== #
+
+if [[ $1 = "help" ]]
+then
+    cat <<EOF
+packager - Created by Ivan Canet
+
+Description:
+    This tool is a wrapper around multiple package managers (pacman, apt...).
+    Each packager tool is named 'packager-<name>'.
+
+    When called, this script will first find all possible tools that are
+    available on this machine, and will prompt the user to choose which to use.
+
+General syntax:
+    packager help
+    packager [-v] <COMMAND> [packages...]
+
+Options:
+    help            Displays this message.
+    -v              Displays debug information.
+
+Commands:
+    i,  install     Installs the given packages.
+    u,  upgrade     Upgrades all packages.
+                    When packages are specified, only upgrades those (if
+                    possible).
+    s,  search      Search for informations about a package.
+    r,  remove      Prompts whether the user wants to remove or purge packages,
+                    then applies the selected option on the given packages.
+    p,  purge       Same as 'remove'.
+Any other command will be passed to the backend.
+EOF
+    exit 0
+fi
+
 # ======================================== V E R B O S I T Y ========================================== #
 
 VERBOSE=0
