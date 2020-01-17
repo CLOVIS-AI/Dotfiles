@@ -16,6 +16,33 @@ upgrade)
     shift
     announce "yay -Syyuu $*"
     yay -Syyuu $*
+    announce "yay -Fy"
+    yay -Fy
+    ;;
+clean)
+    announce "Unneeded/orphan packages:"
+    yay -Qdt
+    announce -nn "Do you want to remove them? (y/N)"
+    read -r CHOICE
+    case $CHOICE in
+    y|Y)
+        packager remove "$(yay -Qdt)"
+        ;;
+    esac
+    announce "Cleaning of the package cache:"
+    echo " u. Remove uninstalled packages from the cache"
+    echo " i. Remove everything from the cache (not recommended)"
+    echo " n. Do not clean the cache"
+    announce -nn "Do you want to clean the cache? (u/i/N)"
+    read -r CHOICE
+    case $CHOICE in
+    u)
+        announce "yay -Sc"
+        yay -Sc;;
+    i)
+        announce "yay -Scc"
+        yay -Scc;;
+    esac
     ;;
 remove)
     shift

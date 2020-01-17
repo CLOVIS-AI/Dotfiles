@@ -16,6 +16,33 @@ upgrade)
     shift
     announce "pacman -Syyuu $*"
     sudo pacman -Syyuu $*
+    announce "pacman -Fy"
+    sudo pacman -Fy
+    ;;
+clean)
+    announce "Unneeded/orphan packages:"
+    pacman -Qdt
+    announce -nn "Do you want to remove them? (y/N)"
+    read -r CHOICE
+    case $CHOICE in
+    y|Y)
+        packager remove "$(pacman -Qdt)"
+        ;;
+    esac
+    announce "Cleaning of the package cache:"
+    echo " u. Remove uninstalled packages from the cache"
+    echo " i. Remove everything from the cache (not recommended)"
+    echo " n. Do not clean the cache"
+    announce -nn "Do you want to clean the cache? (u/i/N)"
+    read -r CHOICE
+    case $CHOICE in
+    u)
+        announce "pacman -Sc"
+        sudo pacman -Sc;;
+    i)
+        announce "pacman -Scc"
+        sudo pacman -Scc;;
+    esac
     ;;
 remove)
     shift
