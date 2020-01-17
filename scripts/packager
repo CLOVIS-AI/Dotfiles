@@ -33,6 +33,9 @@
 # purge [package1] [package2] [...]
 #   Should completely remove the package, any uneeded dependencies, and configuration files.
 #
+# search [package1] [package2] [...]
+#   Should search for a package in the repositories.
+#
 # You can implement any other command you'd like, if needed. Wrappers are allowed to add their own interactive processes (eg. to ask for confirmation...). For example, it is possible to have a wrapper that asks the user whether 'sudo' should be used or not.
 #
 
@@ -146,6 +149,9 @@ function find-command {
         ;;
     upgrade|u)
         COMMAND=upgrade
+        ;;
+    search|s)
+        COMMAND=search
         ;;
     remove|r|purge|p)
         announce "Are you sure you want to completely remove the packages?"

@@ -27,6 +27,29 @@ purge)
     announce "yay -Rncs $*"
     yay -Rncs --confirm $*
     ;;
+search)
+    shift
+    announce "Where do you want to search on?"
+    echo " 0. All packages"
+    echo " 1. Installed packages"
+    echo " 2. Search for a file"
+    announce -nn "Your choice:"
+    read -r CHOICE
+    case $CHOICE in
+    0|a|all)
+        announce "yay -Ss $*"
+        yay -Ss $*
+        ;;
+    1|i|installed)
+        announce "yay -Qi $*"
+        yay -Qi $*
+        ;;
+    2|f|file)
+        announce "yay -F $*"
+        yay -F $*
+        ;;
+    esac
+    ;;
 *)
     announce "Invalid command '$1'."
     exit 2

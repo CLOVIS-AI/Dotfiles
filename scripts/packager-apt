@@ -2,7 +2,8 @@
 
 case $1 in
 enabled)
-    hash apt 2>/dev/null || (echo "'apt' is not installed."; exit 1)
+    hash apt       2>/dev/null || (echo "'apt' is not installed."; exit 1)
+    hash apt-cache 2>/dev/null || (echo "'apt-cache' is not installed."; exit 1)
     ;;
 name)
     echo -n "apt\t(we recommend using 'aptitude' instead, because it is more efficient at conflict-resolution.)"
@@ -38,6 +39,11 @@ remove)
     sudo apt remove $*
     announce "apt autoremove"
     sudo apt autoremove
+    ;;
+search)
+    shift
+    announce "apt-cache search $*"
+    apt-cache search $*
     ;;
 *)
     announce "Invalid command '$1'."
