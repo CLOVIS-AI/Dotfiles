@@ -158,8 +158,8 @@ function find-command {
         echo " y. Yes, delete everything, including uneeded dependencies and configuration."
         echo " r. No, remove the packages but keep the dependencies and configuration."
         echo " n. No, don't do anything."
-        announce "Your choice (y/r/N):"
-        read CHOICE
+        announce -nn "Your choice: (y/r/N)"
+        read -r CHOICE
         case $CHOICE in
         y|yes|p|purge)
             COMMAND=purge
@@ -169,7 +169,8 @@ function find-command {
             ;;
         *)
             announce "Stopping."
-            exit 0;;
+            exit 0
+            ;;
         esac
         ;;
     *)
