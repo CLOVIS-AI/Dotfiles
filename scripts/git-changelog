@@ -191,3 +191,5 @@ do
     fi
     display item "$(echo $line | sed 's/^.*: //')"
 done <<<$(create)
+
+[[ ${CI_PROJECT_URL:-UNDEF} != UNDEF ]] && display text "" && display text "Project URL: $CI_PROJECT_URL"
