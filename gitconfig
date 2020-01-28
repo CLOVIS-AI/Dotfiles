@@ -57,3 +57,4 @@
         ra = rebase --abort
         rc = rebase --continue
         rs = rebase --skip
+        why-ignore = check-ignore -v --no-index
