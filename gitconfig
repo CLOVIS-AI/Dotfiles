@@ -21,6 +21,7 @@
         co = checkout
         c = commit
         cm = commit -m
+        ca = commit --amend
         a = add
         ap = add -p
         add-new-files = add --intent-to-add .
