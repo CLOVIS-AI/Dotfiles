@@ -65,7 +65,18 @@ function angular {
     announce -nn "What did you do?"
     read -r MESSAGE
 
-    git commit -m "$TYPE($SCOPE): $MESSAGE"
+    FILE=$(mktemp)
+    echo -e "$TYPE($SCOPE): $MESSAGE" >>"$FILE"
+
+    cat >>"$FILE" <<EOF
+
+# Give more details about your changes here:
+
+# Explain breaking changes, link to issues you fix.
+
+EOF
+
+    git commit --file="$FILE" --edit
 }
 
 function eslint {
@@ -101,18 +112,23 @@ function eslint {
         exit 0;;
     esac
 
+    FILE=$(mktemp)
+
     announce -nn "What did you do?"
     read -r MESSAGE
+    echo -n "$MESSAGE" >>"$FILE"
     
     announce -nn "Fixes (optional):"
     read -r FIX
-    [[ $FIX != "" ]] && MESSAGE+=" (fixes $FIX)"
+    [[ $FIX != "" ]] && echo -n " (fixes $FIX)" >>"$FILE"
     
     announce -nn "References (optional):"
     read -r REF
-    [[ $REF != "" ]] && MESSAGE+=" (refs $REF)"
+    [[ $REF != "" ]] && echo -n " (refs $REF)" >>"$FILE"
 
-    git commit -m "$TYPE: $MESSAGE"
+    echo >>"$FILE"
+
+    git commit --file="$FILE" --edit
 }
 
 case $STYLE in
