@@ -1,5 +1,7 @@
 #!/bin/bash
 
+FILE=$(mktemp)
+
 announce "Choose your style:"
 echo " 0. Classic"
 echo " 1. Angular"
@@ -10,8 +12,7 @@ read -r STYLE
 function classic {
     announce -nn "What did you do?"
     read -r MSG
-
-    git commit -m "$MSG"
+    echo "$MSG" >>"$FILE"
 }
 
 function angular {
@@ -65,7 +66,6 @@ function angular {
     announce -nn "What did you do?"
     read -r MESSAGE
 
-    FILE=$(mktemp)
     echo -e "$TYPE($SCOPE): $MESSAGE" >>"$FILE"
 
     cat >>"$FILE" <<EOF
@@ -75,8 +75,6 @@ function angular {
 # Explain breaking changes, link to issues you fix.
 
 EOF
-
-    git commit --file="$FILE" --edit
 }
 
 function eslint {
@@ -112,8 +110,6 @@ function eslint {
         exit 0;;
     esac
 
-    FILE=$(mktemp)
-
     announce -nn "What did you do?"
     read -r MESSAGE
     echo -n "$MESSAGE" >>"$FILE"
@@ -127,8 +123,6 @@ function eslint {
     [[ $REF != "" ]] && echo -n " (refs $REF)" >>"$FILE"
 
     echo >>"$FILE"
-
-    git commit --file="$FILE" --edit
 }
 
 case $STYLE in
@@ -144,4 +138,13 @@ case $STYLE in
 *)
     echo "Wrong input."
     exit 1;;
+esac
+
+case $1 in
+--merge|-m)
+    shift;
+    git merge -v --file="$FILE" --edit "$@";;
+--commit|-c|*)
+    shift
+    git commit --file="$FILE" --edit "$@";;
 esac
