@@ -1,5 +1,10 @@
 #!/bin/bash
 
+MERGE_COMMAND="git merge"
+hash compgen 2>/dev/null && compgen -A command "git-ci" >/dev/null && MERGE_COMMAND="git ci --merge"
+
+# ============================================ R E V I E W =========================================================
+
 announce "Starting Git Review..."
 
 announce -nn "Source:"
@@ -87,22 +92,23 @@ function merge {
         esac
     fi
 
-    announce "git merge $OPTIONS $TARGET"
-    git merge $OPTIONS $TARGET
+    announce "$MERGE_COMMAND $OPTIONS $TARGET"
+    # shellcheck disable=SC2086
+    $MERGE_COMMAND $OPTIONS "$TARGET"
 }
 
 function rebase {
     announce "git rebase --interactive $TARGET"
-    git rebase -i $TARGET
+    git rebase -i "$TARGET"
     announce "git checkout $TARGET"
-    git checkout $TARGET
+    git checkout "$TARGET"
     announce "git merge --ff-only $TARGET"
-    git merge --ff-only $TARGET
+    git merge --ff-only "$TARGET"
 }
 
 function squash {
-    announce "git merge --stat --squash $TARGET"
-    git merge --stat --squash $TARGET
+    announce "$MERGE_COMMAND --stat --squash $TARGET"
+    $MERGE_COMMAND --stat --squash "$TARGET"
 }
 
 case $MERGE_METHOD in
