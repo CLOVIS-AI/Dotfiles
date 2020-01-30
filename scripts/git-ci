@@ -52,7 +52,8 @@ function angular {
         TYPE=breaking;;
     *)
         echo "Wrong input."
-        angular;;
+        angular
+        exit 0;;
     esac
 
     announce "Last used scopes:"
@@ -96,7 +97,8 @@ function eslint {
         TYPE=Breaking;;
     *)
         echo "Wrong input."
-        eslint;;
+        eslint
+        exit 0;;
     esac
 
     announce -nn "What did you do?"
