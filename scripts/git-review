@@ -6,21 +6,21 @@ announce -nn "Source:"
 git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/' -e 's/^[[:space:]]*//'
 
 announce -nn "Target:"
-read -i master -e TARGET
+read -r -i master -e TARGET
 
 COMMITS=$(git log --reverse --pretty=format:'%h' $TARGET..)
 
-announce "There are" $(echo $COMMITS | wc -w) "commits. How do you want to review them?"
+announce "There are $(echo $COMMITS | wc -w) commits. How do you want to review them?"
 echo " 0. One-by-one"
 echo " 1. As one"
 announce -nn "Your choice:"
-read REVIEW_MODE
+read -r REVIEW_MODE
 
 function as-one {
     git diff $TARGET..
 
     announce -nn "Accept? (y/N)"
-    read ACCEPT
+    read -r ACCEPT
 
     case $ACCEPT in
     y|yes)
@@ -37,7 +37,7 @@ function one-by-one {
         git show --show-signature $COMMIT
 
         announce -nn "Accept? (y/N)"
-        read ACCEPT
+        read -r ACCEPT
 
         case $ACCEPT in
         y|yes)
@@ -60,20 +60,22 @@ case $REVIEW_MODE in
     exit 1;;
 esac
 
+# ======================================= M E R G E ================================================================
+
 announce "Choose your merge method:"
 echo " 0. Merge     Recommended for beginners"
 echo " 1. Rebase    Cleaner, but harder"
 echo " 2. Squash    Not recommended"
 announce -nn "Your choice:"
-read MERGE_METHOD
+read -r MERGE_METHOD
 
 function merge {
     OPTIONS="--stat --no-squash"
 
-    if git merge-base --is-ancestor $TARGET HEAD
+    if git merge-base --is-ancestor "$TARGET" HEAD
     then
         announce -nn "This branch can be fast-forwarded. Do you want to? (y/N)"
-        read ALLOW_FF
+        read -r ALLOW_FF
 
         case $ALLOW_FF in
         y|yes)
