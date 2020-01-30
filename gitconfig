@@ -4,8 +4,8 @@
         autocrlf = input
         excludesfile = ~/config/gitignore
         editor = emacs -nw
-[credentials]
-        helper = cache
+[credential]
+        helper = cache --timeout 1200
 [alias]
         aliases = config --get-regexp ^alias\\.
         p = pull --prune --ff-only
