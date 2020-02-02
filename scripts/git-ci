@@ -4,7 +4,7 @@ FILE=$(mktemp)
 
 announce "Choose your style:"
 echo " 0. Classic"
-echo " 1. Angular"
+echo " 1. BrainDot"
 echo " 2. ESLint"
 announce -nn "Your choice:"
 read -r STYLE
@@ -15,7 +15,7 @@ function classic {
     echo "$MSG" >>"$FILE"
 }
 
-function angular {
+function braindot {
     announce "Choose the type:"
     echo " 0. build      build system, dependencies"
     echo " 1. ci         CI/CD"
@@ -53,7 +53,7 @@ function angular {
         TYPE=breaking;;
     *)
         echo "Wrong input."
-        angular
+        braindot
         exit 0;;
     esac
 
@@ -129,8 +129,8 @@ case $STYLE in
 0|classic)
     classic
     ;;
-1|angular)
-    angular
+1|braindot)
+    braindot
     ;;
 2|eslint)
     eslint
