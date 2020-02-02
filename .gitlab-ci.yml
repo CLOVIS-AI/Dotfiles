@@ -15,7 +15,7 @@ build-docker:
 
 telegram:
   stage: announce
-  image: registry.gitlab.com/clovis-ai/dotfiles
+  image: registry.gitlab.com/clovis-ai/dotfiles:latest
   script:
     - git changelog --format telegram-html --since yesterday >chlog
     - announce-telegram chlog "$CHAT_IDS"
