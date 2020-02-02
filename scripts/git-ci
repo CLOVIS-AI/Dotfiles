@@ -63,8 +63,16 @@ function braindot {
     announce -nn "Scope of the commit:"
     read -r SCOPE
 
-    announce -nn "What did you do?"
-    read -r MESSAGE
+    while true
+    do
+        echo "    Type your commit message in the past tense"
+        echo " r. Remind me of what I did"
+        announce -nn "What did you do?"
+        read -r MESSAGE
+        
+        [[ $MESSAGE != "r" ]] && break
+        git dc
+    done
 
     echo -e "$TYPE($SCOPE): $MESSAGE" >>"$FILE"
 
