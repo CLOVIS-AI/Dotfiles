@@ -5,24 +5,53 @@ hash compgen 2>/dev/null && compgen -A command "git-ci" >/dev/null && MERGE_COMM
 
 # ============================================ R E V I E W =========================================================
 
-announce "Starting Git Review..."
+SOURCE=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/' -e 's/^[[:space:]]*//' -e 's/(HEAD detached at //' -e 's/)//')
+TARGET=master
+
+function get-back {
+    git checkout "$TARGET" 2>1 >/dev/null
+}
+
+if [[ $1 = "-p" || $1 = "--pull" ]]
+then
+    announce "Fetching the data..."
+    TARGET="$SOURCE"
+    SOURCE=$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)" | sed -e 's/(HEAD detached at //' -e 's/)//')
+    
+    git fetch --prune
+    
+    git checkout "$SOURCE" 2>1 >/dev/null
+    
+    trap get-back INT
+    
+    git review
+    get-back
+    exit 0
+fi
 
 announce -nn "Source:"
-git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/' -e 's/^[[:space:]]*//'
+echo -e "$SOURCE"
 
 announce -nn "Target:"
 read -r -i master -e TARGET
 
-COMMITS=$(git log --reverse --pretty=format:'%h' $TARGET..)
+COMMITS=$(git log --reverse --pretty=format:'%h' $TARGET..$SOURCE)
+COMMITNUMBER="$(echo $COMMITS | wc -w)"
 
-announce "There are $(echo $COMMITS | wc -w) commits. How do you want to review them?"
+if [[ $COMMITNUMBER -eq 0 ]]
+then
+    announce "The two branches are identical, there is nothing to do."
+    exit 0
+fi
+
+announce "There are ${COMMITNUMBER} commits. How do you want to review them?"
 echo " 0. One-by-one"
 echo " 1. As one"
 announce -nn "Your choice:"
 read -r REVIEW_MODE
 
 function as-one {
-    git diff $TARGET..
+    git diff "$TARGET".."$SOURCE"
 
     announce -nn "Accept? (y/N)"
     read -r ACCEPT
@@ -75,9 +104,10 @@ announce -nn "Your choice:"
 read -r MERGE_METHOD
 
 function merge {
+    git checkout "$TARGET" 2>1 >/dev/null
     OPTIONS="--stat --no-squash"
 
-    if git merge-base --is-ancestor "$TARGET" HEAD
+    if git merge-base --is-ancestor "$TARGET" "$SOURCE"
     then
         announce -nn "This branch can be fast-forwarded. Do you want to? (y/N)"
         read -r ALLOW_FF
@@ -85,16 +115,17 @@ function merge {
         case $ALLOW_FF in
         y|yes)
             echo "Allowing fast-forward..."
-            OPTIONS+=" --ff-only";;
+            OPTIONS+=" --ff-only"
+            MERGE_COMMAND="git merge";;
         *)
             echo "Forbidding fast-forward..."
             OPTIONS+=" --no-ff";;
         esac
     fi
 
-    announce "$MERGE_COMMAND $OPTIONS $TARGET"
+    announce "$MERGE_COMMAND $OPTIONS $SOURCE"
     # shellcheck disable=SC2086
-    $MERGE_COMMAND $OPTIONS "$TARGET"
+    $MERGE_COMMAND $OPTIONS "$SOURCE"
 }
 
 function rebase {
@@ -121,3 +152,5 @@ case $MERGE_METHOD in
 *)
     echo "Wrong input.";;
 esac
+
+git checkout "$TARGET"
