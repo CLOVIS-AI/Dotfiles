@@ -14,6 +14,7 @@ function get-back {
 
 if [[ $1 = "-p" || $1 = "--pull" ]]
 then
+    shift
     announce "Fetching the data..."
     TARGET="$SOURCE"
     SOURCE=$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)" | sed -e 's/(HEAD detached at //' -e 's/)//')
@@ -24,16 +25,21 @@ then
     
     trap get-back INT
     
-    git review
+    git review "$TARGET" $*
     get-back
     exit 0
+fi
+
+if [[ $1 != "" ]]
+then
+    TARGET="$1"
 fi
 
 announce -nn "Source:"
 echo -e "$SOURCE"
 
 announce -nn "Target:"
-read -r -i master -e TARGET
+read -r -i "$TARGET" -e TARGET
 
 COMMITS=$(git log --reverse --pretty=format:'%h' $TARGET..$SOURCE)
 COMMITNUMBER="$(echo $COMMITS | wc -w)"
