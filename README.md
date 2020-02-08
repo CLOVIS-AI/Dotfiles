@@ -10,12 +10,13 @@ Clone the repository in `~/config`:
 
 ### .bashrc
 
-Choose what you want, and add it to your `.bashrc`:
+To activate the configuration, add this line to your `.bashrc` or similar file:
 
-    . ~/config/bash-aliases # My custom aliases
-    . ~/config/bash-prompt  # My custom prompt
-    . ~/config/bash-path    # Adds the scripts in scripts/ to your path
-    . ~/config/bashrc       # All of the above
+    . ~/config/selector.sh
+
+It is possible to select which features are activated or not by default. To know what you can do, type:
+
+    . ~/config/selector.sh --help
 
 ### Git config
 
