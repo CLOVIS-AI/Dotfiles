@@ -1,0 +1,65 @@
+#!/bin/bash
+
+function ask-mode {
+    announce "PIP can be ran as root or as user, which do you want?"
+    echo " r. root, system-wide packages"
+    echo " u. user, for personnal packages"
+    announce -nn "Your choice: (r/U)"
+    read -r CHOICE
+    
+    case $CHOICE in
+    r|root)
+        PIP="sudo pip"
+        USER=""
+        ;;
+    *)
+        PIP="pip"
+        USER="--user"
+    esac
+}
+
+case $1 in
+enabled)
+    hash python3 2>/dev/null || (echo "'python3' is not installed."; exit 1)
+    hash pip 2>/dev/null || (echo "'pip' is not installed"; exit 1)
+    ;;
+name)
+    echo -n "pip"
+    ;;
+install)
+    shift
+    ask-mode
+    announce "pip install $*"
+    $PIP install $USER $*
+    ;;
+upgrade)
+    shift
+    if [[ $# -eq 0 ]]
+    then
+        announce "pip list --outdated"
+        pip list --outdated
+        announce "The above packages can be updated. Call 'packager upgrade <package name>' to upgrade them."
+    else
+        ask-mode
+        announce "pip install $USER --upgrade $*"
+        $PIP install $USER --upgrade $*
+    fi
+    ;;
+clean)
+    announce "Nothing to do on PIP."
+    ;;
+remove|purge)
+    shift
+    ask-mode
+    announce "pip uninstall $*"
+    $PIP uninstall $USER $*
+    ;;
+search)
+    shift
+    announce "Not implemented yet. Please submit a merge request at https://gitlab.com/clovis-ai/dotfiles"
+    ;;
+*)
+    announce "Invalid command '$1'."
+    exit 2
+    ;;
+esac
