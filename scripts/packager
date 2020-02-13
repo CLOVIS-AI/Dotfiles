@@ -39,9 +39,15 @@
 # You can implement any other command you'd like, if needed. Wrappers are allowed to add their own interactive processes (eg. to ask for confirmation...). For example, it is possible to have a wrapper that asks the user whether 'sudo' should be used or not.
 #
 
+if [[ $1 == "complete" ]]
+then
+    complete -W "install help upgrade search remove v" packager
+    return
+fi
+
 # ============================================= H E L P =============================================== #
 
-if [[ $1 = "help" ]]
+if [[ $1 == "help" || $1 == "--help" ]]
 then
     cat <<EOF
 packager - Created by Ivan Canet
@@ -78,7 +84,7 @@ fi
 # ======================================== V E R B O S I T Y ========================================== #
 
 VERBOSE=0
-if [[ $1 = "-v" ]]
+if [[ $1 == "v" || $1 == "-v" ]]
 then
     VERBOSE=1
     shift

@@ -20,11 +20,13 @@ Options:
     --no-bash-aliases       Do not source the bash aliases
     --no-bash-prompt        Do not source the bash prompt
     --no-scripts            Do not add the customized scripts to the PATH variable
+    --no-completion         Do not add bash completion
 
 Environment variables:
     CLOVIS_CONFIG_ALIASES   Source the Bash aliases (default: yes)
     CLOVIS_CONFIG_PROMPT    Source the Bash prompt (default: yes)
     CLOVIS_CONFIG_SCRIPTS   Add the scripts to the PATH (default: yes)
+    CLOVIS_CONFIG_COMPLETE  Sets up bash completion
 EOF
 fi
 
@@ -54,6 +56,9 @@ do
         ;;
     --no-scripts)
         CLOVIS_CONFIG_SCRIPTS=no
+        ;;
+    --no-completion)
+        CLOVIS_CONFIG_COMPLETE=no
         ;;
     esac
     shift
@@ -88,4 +93,16 @@ then
 
     # shellcheck source=bash-path
     . "$CLOVIS_CONFIG"/bash-path
+fi
+
+if [[ ${CLOVIS_CONFIG_COMPLETE:-yes} == yes ]]
+then
+    debug "Sourcing bash completion for the different commands..."
+
+    # shellcheck source=scripts/packager
+    . "$CLOVIS_CONFIG"/scripts/packager complete
+
+    # shellcheck source=scripts/announce
+    . "$CLOVIS_CONFIG"/scripts/announce complete
+
 fi
