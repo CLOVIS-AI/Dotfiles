@@ -121,7 +121,12 @@ then
     debug "Setting up git autofetch..."
     
     export PROMPT_COMMAND
-    PROMPT_COMMAND="$PROMPT_COMMAND; git autofetch"
+    if [[ "$PROMPT_COMMAND" == "" ]]
+    then
+        PROMPT_COMMAND="git autofetch"
+    else
+        PROMPT_COMMAND="$PROMPT_COMMAND; git autofetch"
+    fi
 fi
 
 if [[ ${CLOVIS_CONFIG_AFCONFIG:-yes} == yes ]]
