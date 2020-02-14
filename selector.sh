@@ -21,12 +21,16 @@ Options:
     --no-bash-prompt        Do not source the bash prompt
     --no-scripts            Do not add the customized scripts to the PATH variable
     --no-completion         Do not add bash completion
+    --no-autofetch          Do not auto-fetch git repositories
+    --no-autofetch-config   Do not auto-fetch the configuration repository
 
 Environment variables:
     CLOVIS_CONFIG_ALIASES   Source the Bash aliases (default: yes)
     CLOVIS_CONFIG_PROMPT    Source the Bash prompt (default: yes)
     CLOVIS_CONFIG_SCRIPTS   Add the scripts to the PATH (default: yes)
-    CLOVIS_CONFIG_COMPLETE  Sets up bash completion
+    CLOVIS_CONFIG_COMPLETE  Sets up bash completion (default: yes)
+    CLOVIS_CONFIG_AUTOFETCH Autofetches git repositories when entering them (default: yes)
+    CLOVIS_CONFIG_AFCONFIG  Autofetches the configuration repository (default: yes)
 EOF
 fi
 
@@ -59,6 +63,12 @@ do
         ;;
     --no-completion)
         CLOVIS_CONFIG_COMPLETE=no
+        ;;
+    --no-autofetch)
+        CLOVIS_CONFIG_AUTOFETCH=no
+        ;;
+    --no-autofetch-config)
+        CLOVIS_CONFIG_AFCONFIG=no
         ;;
     esac
     shift
@@ -104,5 +114,22 @@ then
 
     # shellcheck source=scripts/announce
     . "$CLOVIS_CONFIG"/scripts/announce complete
+fi
 
+if [[ ${CLOVIS_CONFIG_AUTOFETCH:-yes} == yes ]]
+then
+    debug "Setting up git autofetch..."
+    
+    export PROMPT_COMMAND
+    PROMPT_COMMAND="$PROMPT_COMMAND; git autofetch"
+fi
+
+if [[ ${CLOVIS_CONFIG_AFCONFIG:-yes} == yes ]]
+then
+    debug "Autofetching the configuration repository..."
+    
+    here=$(pwd)
+    cd "$CLOVIS_CONFIG"
+    git autofetch
+    cd "$here"
 fi

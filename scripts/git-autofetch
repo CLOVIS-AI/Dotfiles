@@ -1,0 +1,32 @@
+#!/bin/bash
+
+TMP="/tmp/clovis-git-autofetch"
+[[ ! -f "$TMP" ]] && touch "$TMP"
+
+VERBOSE=0
+[[ ${1:-no} == --verbose ]] && VERBOSE=1
+
+function debug {
+    [[ $VERBOSE == 1 ]] && echo -e "$*"
+}
+
+ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [[ "$ROOT" == "" ]]
+then
+    debug "Not in a git repository."
+    exit 0
+fi
+debug "Current project root: $ROOT"
+
+if <"$TMP" grep "$ROOT" >/dev/null
+then
+    debug "Project has already been autofetch'd recently."
+    exit 0
+else
+    debug "Project has not been autofetch'd recently."
+fi
+
+announce "Automatically fetching the repository $ROOT..."
+git fetch --all --prune
+
+echo "$ROOT" >>"$TMP"
