@@ -28,5 +28,6 @@ fi
 
 announce "Automatically fetching the repository $ROOT..."
 git fetch --all --prune
+git changelog ..FETCH_HEAD
 
 echo "$ROOT" >>"$TMP"
