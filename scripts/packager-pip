@@ -23,10 +23,10 @@ function ask-mode {
         else
             announce "Not running in a virtual environment, please try again."
             ask-mode
-        fi
+        fi;;
     *)
         PIP="pip"
-        USER="--user"
+        USER="--user";;
     esac
 }
 
