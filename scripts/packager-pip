@@ -1,10 +1,13 @@
 #!/bin/bash
 
 function ask-mode {
+    [[ "$VIRTUAL_ENV" == "" ]]; IN_ENV=$?
+
     announce "PIP can be ran as root or as user, which do you want?"
     echo " r. root, system-wide packages"
     echo " u. user, for personnal packages"
-    announce -nn "Your choice: (r/U)"
+    [[ "$IN_ENV" == 1 ]] && echo " v. virtual environment"
+    announce -nn "Your choice: (r/U/v)"
     read -r CHOICE
     
     case $CHOICE in
@@ -12,6 +15,15 @@ function ask-mode {
         PIP="sudo pip"
         USER=""
         ;;
+    v|virtual)
+        if [[ "$IN_ENV" == 1 ]]
+        then
+            PIP="pip"
+            USER=""
+        else
+            announce "Not running in a virtual environment, please try again."
+            ask-mode
+        fi
     *)
         PIP="pip"
         USER="--user"
@@ -29,8 +41,14 @@ name)
 install)
     shift
     ask-mode
-    announce "pip install $*"
-    $PIP install $USER $*
+    if [[ $# == 0 ]]
+    then
+        announce "pip install -r requirements.txt"
+        $PIP install -r $USER requirements.txt
+    else
+        announce "pip install $*"
+        $PIP install $USER $*
+    fi
     ;;
 upgrade)
     shift
