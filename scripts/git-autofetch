@@ -4,7 +4,7 @@ TMP="/tmp/clovis-git-autofetch"
 [[ ! -f "$TMP" ]] && touch "$TMP"
 
 VERBOSE=0
-[[ ${1:-no} == --verbose ]] && VERBOSE=1
+[[ ${1:-no} == "--verbose" ]] && VERBOSE=1
 
 function debug {
     [[ $VERBOSE == 1 ]] && echo -e "$*"
@@ -18,6 +18,14 @@ then
 fi
 debug "Current project root: $ROOT"
 
+
+if [[ "$1" == "--ignore" ]]
+then
+    echo "Will not autofetch for this session."
+    echo "$ROOT" >>"$TMP"
+    exit 0
+fi
+
 if <"$TMP" grep "$ROOT" >/dev/null
 then
     debug "Project has already been autofetch'd recently."
@@ -27,7 +35,13 @@ else
 fi
 
 announce "Automatically fetching the repository $ROOT..."
-git fetch --all --prune
-git changelog ..FETCH_HEAD
+echo "To stop autofetching, execute 'git autofetch --ignore'"
+git fetch --all --prune || exit 1
+COMMITS=$(git log ..FETCH_HEAD)
+if [[ "$COMMITS" != "" ]]
+then
+    echo
+    git changelog ..FETCH_HEAD
+fi
 
-echo "$ROOT" >>"$TMP"
+git autofetch --ignore
