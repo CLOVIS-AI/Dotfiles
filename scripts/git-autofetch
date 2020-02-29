@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TMP="/tmp/clovis-git-autofetch"
+TMP="/tmp/clovis-git-autofetch-$USER"
 [[ ! -f "$TMP" ]] && touch "$TMP"
 
 VERBOSE=0
