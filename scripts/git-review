@@ -244,4 +244,5 @@ then
 	strat-remote-local
 else
 	announce "Sorry, I can't handle two remote branches at the moment."
+	echo "One way to do it would be to call this script twice, from $SOURCE_DISPLAY to a local branch, and then from that local branch to $TARGET_DISPLAY."
 fi
