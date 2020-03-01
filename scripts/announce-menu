@@ -1,0 +1,89 @@
+#!/bin/bash
+
+#
+# announce-menu
+# Written by Ivan Canet
+#
+# Usage:
+#	announce-menu [--title TITLE] [--question QUESTION] [--default DEFAULT] <replies...>
+#	announce-menu --file-path
+#	announce-menu --chosen CHOICE
+#
+# Options:
+#	--title			Add a title line.
+#	--question		Override the "Your choice:" question with something else.
+#
+
+# **************************** OPTION HANDLING *********************************
+
+ANNOUNCE_MENU_PATH="/tmp/clovis-announce-$USER"
+[[ $1 == "--file-path" ]] && exec echo "$ANNOUNCE_MENU_PATH"
+
+[[ $1 == "--chosen" ]] && exec test "$(cat "$ANNOUNCE_MENU_PATH")" == "$2"
+
+if [[ $1 == "--title" ]]
+then
+	announce "$2"
+	shift
+	shift
+fi
+
+QUESTION="Your choice:"
+if [[ $1 == "--question" ]]
+then
+	QUESTION="$2"
+	shift
+	shift
+fi
+
+if [[ $1 == "--default" ]]
+then
+	DEFAULT="$2"
+	shift
+	shift
+fi
+
+# ****************************** DISPLAYING ************************************
+
+declare -A CHOICES
+ANSWERS=""
+
+function clean-word {
+	# shellcheck disable=SC2001
+	WORD=$(<<<"$1" sed 's|:.*||')
+}
+
+i=0
+function display-int {
+	clean-word "$1"
+	ANSWERS+="$i.:$1\n"
+	CHOICES[$i]="$WORD"
+	CHOICES[$WORD]="$WORD"
+	i=$((i+1))
+}
+
+for input in "$@"
+do
+	display-int "$input"
+done
+echo -e "$ANSWERS" | column -t -s ':' | less -rFX
+
+# ******************************* QUESTION *************************************
+
+CHOICE=""
+
+while [[ $CHOICE == "" ]]
+do
+	announce -nn "$QUESTION${DEFAULT+ ($DEFAULT)}"
+	read -r REPLY
+	REPLY=${REPLY:-$DEFAULT}
+
+	if [[ $REPLY == "" || ${CHOICES[REPLY]+_} ]]
+	then
+		echo "Wrong input, please try again."
+	else
+		CHOICE=${CHOICES[$REPLY]}
+	fi
+done
+
+echo "$CHOICE" >"$ANNOUNCE_MENU_PATH"
