@@ -1,164 +1,247 @@
 #!/bin/bash
 
+# git preview
+# Written by Ivan “CLOVIS” Canet
+#
+# Description:
+#	Allows the user to interactively merge two branches, using the different
+#	systems handled by Git.
+#	When the script starts, it will prompt for the two branches that are to be
+#	merged.
+
 MERGE_COMMAND="git merge"
 hash compgen 2>/dev/null && compgen -A command "git-ci" >/dev/null && MERGE_COMMAND="git ci --merge"
 
-# ============================================ R E V I E W =========================================================
+ANNOUNCE_CHOICE=$(announce-menu --file-path)
 
-SOURCE=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/' -e 's/^[[:space:]]*//' -e 's/(HEAD detached at //' -e 's/)//')
-TARGET=master
+LOCAL_BRANCHES=$(git for-each-ref refs/heads --format='%(refname)' | sed 's|refs/heads/||')
+REMOTE_BRANCHES=$(git for-each-ref refs/remotes --format='%(refname)' | sed 's|refs/remotes/||;s|.*/HEAD||')
+CURRENT_BRANCH=$(git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/' -e 's/^[[:space:]]*//' -e 's/(HEAD detached at //' -e 's/)//')
+TRACKED_BRANCH=$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)")
+[[ $TRACKED_BRANCH == "" ]] && unset TRACKED_BRANCH
 
-function get-back {
-    git checkout "$TARGET" >/dev/null 2>&1
+# ********************************** Explain ***********************************
+
+echo
+announce "Welcome to Git Review!"
+echo "This tool will allow you to merge or rebase any two branches."
+echo "The 'source' branch is the one you want to take commits from, the 'target' branch is the one you want to put commits into."
+
+# ****************************** Select the branches ***************************
+
+function select-branch() {
+	# shellcheck disable=SC2086
+	announce-menu --title "$1" --default "$2" $LOCAL_BRANCHES ${TRACKED_BRANCH+"$TRACKED_BRANCH:Upstream branch"} "remote:Select a remote branch"
+	if announce-menu --chosen "remote"; then
+		# shellcheck disable=SC2086
+		announce-menu --title "$1" $REMOTE_BRANCHES
+	fi
+
+	CHOICE_DISPLAY=$(cat "$ANNOUNCE_CHOICE")
+	# shellcheck disable=SC2001
+	CHOICE_REMOTE="$(<<<"$CHOICE_DISPLAY" sed 's|/.*||')"
+	# shellcheck disable=SC2001
+	CHOICE="$(<<<"$CHOICE_DISPLAY" sed "s|$CHOICE_REMOTE/||")"
+
+	[[ $CHOICE == "$CHOICE_REMOTE" ]] && CHOICE_REMOTE=""
 }
 
-if [[ $1 = "-p" || $1 = "--pull" ]]
+# ********************************* Diff ***************************************
+
+function do-diff-as-one {
+	git diff "$TARGET_DISPLAY".."$SOURCE_DISPLAY"
+
+	announce-menu --question "Accept?" --default "no" "yes" "no"
+	if announce-menu --chosen "yes"
+	then
+		echo "Accepted."
+	else
+		echo "Aborting..."
+		exit 0
+	fi
+}
+
+function do-diff-one-by-one() {
+	for COMMIT in $COMMITS; do
+		git show --show-signature "$COMMIT"
+
+		announce-menu --question "Accept?" --default "no" "yes" "no"
+		if announce-menu --chosen "yes"
+		then
+			echo "Accepted commit $COMMIT."
+		else
+			echo "Aborting..."
+			exit 0
+		fi
+	done
+	announce "You accepted all commits."
+}
+
+function do-diff {
+	COMMITS=$(git log --reverse --pretty=format:'%h' "$TARGET_DISPLAY".."$SOURCE_DISPLAY")
+	COMMITNUMBER="$(<<<"$COMMITS" wc -w)"
+
+	if [[ $COMMITNUMBER -eq 0 ]]; then
+		announce "The two branches are identical, there is nothing to do."
+		exit 0
+	fi
+
+	if [[ $COMMITNUMBER -eq 1 ]]; then
+		do-diff-as-one
+		return
+	fi
+
+	announce-menu --title "There are $COMMITNUMBER commits." "as one:Review everything at once" "one-by-one:Review each commit separately"
+	case $(cat "$ANNOUNCE_CHOICE") in
+	"as one")
+		do-diff-as-one;;
+	"one-by-one")
+		do-diff-one-by-one;;
+	esac
+}
+
+
+function announce-do {
+	announce "$ $*"
+	# shellcheck disable=SC2048
+	$*
+}
+
+# ******************************* Local work ***********************************
+
+function do-local-merge {
+	ALLOW_FF="--no-ff"
+	if git merge-base --is-ancestor "$TARGET_DISPLAY" "$SOURCE"
+	then
+		announce-menu --title "Your branches can be fast-forwarded, do you want to?" \
+			"yes:The branches will kept as they are" \
+			"no:A new empty commit will be created"
+		if announce-menu --chosen "yes"
+		then
+			ALLOW_FF="--ff-only"
+			MERGE_COMMAND="git merge"
+		fi
+	fi
+
+	[[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]] && announce-do git checkout "$TARGET_DISPLAY" || exit 1
+	announce-do "$MERGE_COMMAND" --stat $ALLOW_FF "$SOURCE"
+	[[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]] && announce-do git checkout "$CURRENT_BRANCH"
+}
+
+function do-local-rebase {
+	[[ ! $CURRENT_BRANCH == "$SOURCE" ]] && announce-do git checkout "$SOURCE" || exit 1
+
+	announce-do git rebase -i "$TARGET" || (announce "Could not rebase automatically, after finishing the rebase manually you will need to fast-forward $SOURCE onto $TARGET (you can run 'git review' again to do it)" && exit 1)
+
+	git checkout "$TARGET" || exit 1
+
+	announce-do git merge --stat --ff-only "$TARGET"
+
+	[[ ! $CURRENT_BRANCH == "$TARGET" ]] && announce-do git checkout "$CURRENT_BRANCH"
+}
+
+function do-rebase-from-remote {
+	if git show-ref --verify --quiet refs/heads/"$SOURCE"
+	then
+		if [[ $(git rev-parse "$SOURCE") != $(git rev-parse "$SOURCE_DISPLAY") ]]
+		then
+			announce-menu --title "A local branch called $SOURCE exists and is different from $SOURCE_DISPLAY." \
+				"overwrite:Reset $SOURCE so it's exactly the same as $SOURCE_DISPLAY" \
+				"give up:Give up the review, do not touch anything."
+			announce-menu --chosen "give up" && exit 0
+		fi
+	fi
+
+	announce-do git checkout -B "$SOURCE" "$SOURCE_DISPLAY" || exit 1
+	do-local-rebase
+}
+
+function do-local-squash {
+	[[ ! $CURRENT_BRANCH == "$TARGET" ]] && announce-do git checkout "$TARGET_DISPLAY" || exit 1
+	announce-do "$MERGE_COMMAND" --stat --squash "$TARGET_DISPLAY"
+	[[ ! $CURRENT_BRANCH == "$TARGET" ]] && announce-do git checkout "$CURRENT_BRANCH"
+}
+
+function do-local-work {
+	if [[ $1 == "--from-remote" ]]
+	then
+		FROM_REMOTE="true"
+	fi
+
+	announce-menu --title "Which strategy do you want to use?" \
+		"merge:Easiest, keeps both branches" \
+		"rebase:Not for beginners, copies the commits onto the target" \
+		"squash:Not recommended because of the loss of history"
+	case $(cat "$ANNOUNCE_CHOICE") in
+	"merge")
+		do-local-merge;;
+	"rebase")
+		if [[ $FROM_REMOTE == "true" ]]; then
+			do-rebase-from-remote
+		else
+			do-local-rebase
+		fi;;
+	"squash")
+		do-local-squash;;
+	esac
+}
+
+function strat-local-local {
+	do-diff
+	do-local-work
+}
+
+function strat-local-remote {
+	(announce-do git fetch "$TARGET_REMOTE" --prune) || announce "Could not fetch, continuing anyway..."
+	do-diff
+
+	PUSH_OPTIONS=""
+	[[ $CURRENT_BRANCH != "$SOURCE" ]] && announce-do git checkout "$SOURCE"
+	if git rev-list --count "$TARGET_DISPLAY".."$SOURCE" -geq 1
+	then
+		announce-menu --title "$SOURCE is ahead $TARGET_DISPLAY, you cannot push." \
+			"force:Force-push and overwrite the remote branch (unsafe!)" \
+			"give up:Do not do anything."
+		announce-menu --chosen "give up" && exit 0
+		PUSH_OPTIONS+=" --force"
+	fi
+	announce-do git push "$PUSH_OPTIONS" "$TARGET_REMOTE" "$TARGET"
+	[[ $CURRENT_BRANCH != "$SOURCE" ]] && announce-do git checkout "$CURRENT_BRANCH"
+}
+
+function strat-remote-local {
+	announce-do git fetch "$SOURCE_REMOTE" --prune || announce "Could not fetch, continuing anyway..."
+	do-diff
+	do-local-work --from-remote
+}
+
+# ***************************** Execution **************************************
+
+echo
+select-branch "Which branch do you want to take commits from?" "$CURRENT_BRANCH"
+SOURCE_REMOTE=$CHOICE_REMOTE
+SOURCE=$CHOICE
+SOURCE_DISPLAY=$CHOICE_DISPLAY
+
+DEFAULT="master"
+[[ $TRACKED_BRANCH != "" ]] && DEFAULT=$TRACKED_BRANCH
+echo
+select-branch "In which branch do you want to put those commits?" "$DEFAULT"
+TARGET_REMOTE=$CHOICE_REMOTE
+TARGET=$CHOICE
+TARGET_DISPLAY=$CHOICE_DISPLAY
+
+echo
+announce "Okay, I will take commits from '$SOURCE_DISPLAY' and put them in '$TARGET_DISPLAY'"
+if [[ $SOURCE_REMOTE == "" && $TARGET_REMOTE == "" ]]
 then
-    shift
-    announce "Fetching the data..."
-    TARGET="$SOURCE"
-    SOURCE=$(git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)" | sed -e 's/(HEAD detached at //' -e 's/)//')
-    
-    git fetch --prune
-    
-    git checkout "$SOURCE" >/dev/null 2>&1
-    
-    trap get-back INT
-
-    # shellcheck disable=SC2048
-    # shellcheck disable=SC2086
-    git review "$TARGET" $*
-    get-back
-    exit 0
-fi
-
-if [[ $1 != "" ]]
+	strat-local-local
+elif [[ $SOURCE_REMOTE == "" && ! $TARGET_REMOTE == "" ]]
 then
-    TARGET="$1"
-fi
-
-announce -nn "Source:"
-echo -e "$SOURCE"
-
-announce -nn "Target:"
-read -r -i "$TARGET" -e TARGET
-
-COMMITS=$(git log --reverse --pretty=format:'%h' "$TARGET".."$SOURCE")
-COMMITNUMBER="$(echo "$COMMITS" | wc -w)"
-
-if [[ $COMMITNUMBER -eq 0 ]]
+	strat-local-remote
+elif [[ $TARGET_REMOTE == "" ]]
 then
-    announce "The two branches are identical, there is nothing to do."
-    exit 0
+	strat-remote-local
+else
+	announce "Sorry, I can't handle two remote branches at the moment."
 fi
-
-announce "There are ${COMMITNUMBER} commits. How do you want to review them?"
-echo " 0. One-by-one"
-echo " 1. As one"
-announce -nn "Your choice:"
-read -r REVIEW_MODE
-
-function as-one {
-    git diff "$TARGET".."$SOURCE"
-
-    announce -nn "Accept? (y/N)"
-    read -r ACCEPT
-
-    case $ACCEPT in
-    y|yes)
-        echo "Merge accepted.";;
-    *)
-        echo "Aborting."
-        exit 0;;
-    esac
-}
-
-function one-by-one {
-    for COMMIT in $COMMITS
-    do
-        git show --show-signature "$COMMIT"
-
-        announce -nn "Accept? (y/N)"
-        read -r ACCEPT
-
-        case $ACCEPT in
-        y|yes)
-            echo "Commit $COMMIT accepted.";;
-        *)
-            echo "Aborting."
-            exit 0;;
-        esac
-    done
-    announce "You accepted all commits."
-}
-
-case $REVIEW_MODE in
-0)
-    one-by-one;;
-1)
-    as-one;;
-*)
-    echo "Wrong input."
-    exit 1;;
-esac
-
-# ======================================= M E R G E ================================================================
-
-announce "Choose your merge method:"
-echo " 0. Merge     Recommended for beginners"
-echo " 1. Rebase    Cleaner, but harder"
-echo " 2. Squash    Not recommended"
-announce -nn "Your choice:"
-read -r MERGE_METHOD
-
-function merge {
-    git checkout "$TARGET" >/dev/null 2>&1
-    OPTIONS="--stat --no-squash"
-
-    if git merge-base --is-ancestor "$TARGET" "$SOURCE"
-    then
-        announce -nn "This branch can be fast-forwarded. Do you want to? (y/N)"
-        read -r ALLOW_FF
-
-        case $ALLOW_FF in
-        y|yes)
-            echo "Allowing fast-forward..."
-            OPTIONS+=" --ff-only"
-            MERGE_COMMAND="git merge";;
-        *)
-            echo "Forbidding fast-forward..."
-            OPTIONS+=" --no-ff";;
-        esac
-    fi
-
-    announce "$MERGE_COMMAND $OPTIONS $SOURCE"
-    # shellcheck disable=SC2086
-    $MERGE_COMMAND $OPTIONS "$SOURCE"
-}
-
-function rebase {
-    announce "git rebase --interactive $TARGET"
-    git rebase -i "$TARGET"
-    announce "git checkout $TARGET"
-    git checkout "$TARGET"
-    announce "git merge --ff-only $TARGET"
-    git merge --ff-only "$TARGET"
-}
-
-function squash {
-    announce "$MERGE_COMMAND --stat --squash $TARGET"
-    $MERGE_COMMAND --stat --squash "$TARGET"
-}
-
-case $MERGE_METHOD in
-0|m|merge)
-    merge;;
-1|r|rebase)
-    rebase;;
-2|s|squash)
-    squash;;
-*)
-    echo "Wrong input.";;
-esac
-
-git checkout "$TARGET"
