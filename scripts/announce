@@ -1,25 +1,25 @@
 #!/bin/bash
 
-if [[ $1 = "complete" ]]
+if [[ $1 == "complete" ]]
 then
     complete -o nosort -W "-n --newline-before -r --erase -nn --no-newline-after" announce
 
     return
 fi
 
-if [[ $1 = "-n" || $1 = "--newline-before" ]]
+if [[ $1 == "-n" || $1 == "--newline-before" ]]
 then
     echo
     shift
 fi
 
-if [[ $1 = "-r" || $1 = "--erase" ]]
+if [[ $1 == "-r" || $1 == "--erase" ]]
 then
     echo -ne "\033[2K\r"
     shift
 fi
 
-if [[ $1 = "-nn" || $1 = "--no-newline-after" ]]
+if [[ $1 == "-nn" || $1 == "--no-newline-after" ]]
 then
     PARAMS="-n"
     shift
