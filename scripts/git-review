@@ -9,7 +9,7 @@ SOURCE=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/' -e 's/
 TARGET=master
 
 function get-back {
-    git checkout "$TARGET" 2>1 >/dev/null
+    git checkout "$TARGET" >/dev/null 2>&1
 }
 
 if [[ $1 = "-p" || $1 = "--pull" ]]
@@ -21,10 +21,12 @@ then
     
     git fetch --prune
     
-    git checkout "$SOURCE" 2>1 >/dev/null
+    git checkout "$SOURCE" >/dev/null 2>&1
     
     trap get-back INT
-    
+
+    # shellcheck disable=SC2048
+    # shellcheck disable=SC2086
     git review "$TARGET" $*
     get-back
     exit 0
@@ -41,8 +43,8 @@ echo -e "$SOURCE"
 announce -nn "Target:"
 read -r -i "$TARGET" -e TARGET
 
-COMMITS=$(git log --reverse --pretty=format:'%h' $TARGET..$SOURCE)
-COMMITNUMBER="$(echo $COMMITS | wc -w)"
+COMMITS=$(git log --reverse --pretty=format:'%h' "$TARGET".."$SOURCE")
+COMMITNUMBER="$(echo "$COMMITS" | wc -w)"
 
 if [[ $COMMITNUMBER -eq 0 ]]
 then
@@ -74,7 +76,7 @@ function as-one {
 function one-by-one {
     for COMMIT in $COMMITS
     do
-        git show --show-signature $COMMIT
+        git show --show-signature "$COMMIT"
 
         announce -nn "Accept? (y/N)"
         read -r ACCEPT
@@ -110,7 +112,7 @@ announce -nn "Your choice:"
 read -r MERGE_METHOD
 
 function merge {
-    git checkout "$TARGET" 2>1 >/dev/null
+    git checkout "$TARGET" >/dev/null 2>&1
     OPTIONS="--stat --no-squash"
 
     if git merge-base --is-ancestor "$TARGET" "$SOURCE"
