@@ -14,16 +14,13 @@ do
 	COMMAND=""
 	[[ $remote != "$HOSTNAME" ]] && COMMAND="ssh -At $remote"
 
-	users=$($COMMAND who | cut -d ' ' -f 1 | uniq)
+	users=$($COMMAND who | grep -v 'scripts/announce' | cut -d ' ' -f 1 | uniq)
 	for user in $users
 	do
 		echo "Found user $user here!"
 		if [[ $user == "$USER" ]]
 		then
 			echo -n ""
-		elif [[ ${FOUND[$user]+_} ]]
-		then
-			FOUND[$user]="$remote"
 		else
 			FOUND[$user]="${FOUND[$user]} $remote"
 		fi
