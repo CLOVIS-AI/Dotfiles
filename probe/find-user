@@ -9,7 +9,7 @@ number=$(<<<"$REMOTES" wc -l)
 i=0
 for remote in $HOSTNAME $REMOTES
 do
-	announce "... $remote ($i/$number)"
+	announce "($i/$number): $remote"
 
 	COMMAND=""
 	[[ $remote != "$HOSTNAME" ]] && COMMAND="ssh -At $remote"
@@ -17,7 +17,11 @@ do
 	users=$($COMMAND who | cut -d ' ' -f 1 | uniq)
 	for user in $users
 	do
-		if [[ ${FOUND[$user]+_} ]]
+		echo "Found user $user here!"
+		if [[ $user == "$USER" ]]
+		then
+			echo -n ""
+		elif [[ ${FOUND[$user]+_} ]]
 		then
 			FOUND[$user]="$remote"
 		else
