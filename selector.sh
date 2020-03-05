@@ -109,8 +109,8 @@ if [[ ${CLOVIS_CONFIG_COMPLETE:-yes} == yes ]]
 then
     debug "Sourcing bash completion for the different commands..."
 
-    # shellcheck source=scripts/packager
-    . "$CLOVIS_CONFIG"/scripts/packager complete
+    # shellcheck source=packager/packager
+    . "$CLOVIS_CONFIG"/packager/packager complete
 
     # shellcheck source=scripts/announce
     . "$CLOVIS_CONFIG"/scripts/announce complete

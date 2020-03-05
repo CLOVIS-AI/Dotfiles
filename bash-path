@@ -4,4 +4,4 @@
 
 CONFIG=${CLOVIS_CONFIG:-$HOME/config}
 
-PATH=$PATH:$CONFIG/scripts
+PATH=$PATH:$CONFIG/scripts:$CONFIG/packager:$CONFIG/probe
