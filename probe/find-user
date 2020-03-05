@@ -1,0 +1,31 @@
+#!/bin/bash
+
+CONFIG="$HOME/.config/clovis-probe/"
+REMOTES=$(cat "$CONFIG/remotes")
+
+declare -A FOUND
+
+for remote in $HOSTNAME $REMOTES
+do
+	announce "... $remote"
+
+	COMMAND=""
+	[[ $remote != "$HOSTNAME" ]] && COMMAND="ssh -At $remote"
+
+	users=$($COMMAND who | cut -d ' ' -f 1 | uniq)
+	for user in $users
+	do
+		if [[ ${FOUND[$user]+_} ]]
+		then
+			FOUND[$user]="$remote"
+		else
+			FOUND[$user]="${FOUND[$user]} $remote"
+		fi
+	done
+done
+
+announce "Results:"
+for user in "${!FOUND[@]}"
+do
+	echo "$user → ${FOUND[$user]}"
+done | column -t
