@@ -1,13 +1,15 @@
 #!/bin/bash
 
-CONFIG="$HOME/.config/clovis-probe/"
+CONFIG="$HOME/.config/clovis-probe"
 REMOTES=$(cat "$CONFIG/remotes")
 
 declare -A FOUND
 
+number=$(<<<"$REMOTES" wc -l)
+i=0
 for remote in $HOSTNAME $REMOTES
 do
-	announce "... $remote"
+	announce "... $remote ($i/$number)"
 
 	COMMAND=""
 	[[ $remote != "$HOSTNAME" ]] && COMMAND="ssh -At $remote"
@@ -22,6 +24,8 @@ do
 			FOUND[$user]="${FOUND[$user]} $remote"
 		fi
 	done
+
+	i=$((i+1))
 done
 
 announce "Results:"
