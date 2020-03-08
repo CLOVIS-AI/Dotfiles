@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [[ $1 == "--exclude-first" ]]
+then
+	EXCLUDE_FIRST=$(true)
+	shift
+else
+	unset EXCLUDE_FIRST
+fi
+
+function work {
+	declare -A master
+
+	read -r line
+	master[0]=$(<<<"$line" cut -d ' ' -f 1)
+	master[1]=$(<<<"$line" cut -d ' ' -f 2)
+	if [[ $EXCLUDE_FIRST ]]; then echo "main:${master[0]}"; else echo "current:${master[0]}"; fi
+	echo "main:${master[1]}"
+
+    while IFS="" read -r line; do
+    	commit="$(<<<"$line" cut -d ' ' -f 1)"
+
+		# shellcheck disable=SC2199
+		# shellcheck disable=SC2076
+		if [[ " ${master[@]} " =~ " $commit " ]]; then # the commit is on master
+	        # shellcheck disable=SC2013
+	        for parent in $(<<<"$line" cut -d ' ' -f 1 --complement); do
+	        	master[${#master[@]}]=$parent
+	        	echo "main:$parent"
+	        done
+		else # the commit is not on master
+			echo "current:$commit"
+		fi
+    done
+}
+
+git rev-list --parents "${@-HEAD}" | work
