@@ -65,15 +65,16 @@ function display {
         esac
         ;;
     telegram-html)
+        ESCAPED=$(<<<"$2" sed 's|&|\&amp|g;s|<|\&lt |g;s|>| \&gt|g;s|"|\&quot|g;s|'"'"'|\&#39|g')
         case $1 in
         title)
-            echo "<strong>$2</strong>"
+            echo "<strong>$ESCAPED</strong>"
             ;;
         text)
-            echo $2
+            echo "$ESCAPED"
             ;;
         item)
-            echo " • $2"
+            echo " • $ESCAPED"
             ;;
         esac
         ;;
