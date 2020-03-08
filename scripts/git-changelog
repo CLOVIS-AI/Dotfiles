@@ -85,7 +85,17 @@ function display {
 }
 [[ $1 != "--no-title" ]] && display title "Changelog${CI_PROJECT_TITLE+" of "}${CI_PROJECT_TITLE}" || shift
 
-# === LOGIC ===
+unset COMMITS
+if [[ $1 == "--incoming" ]]
+then
+	shift
+	git show -s --format="%s%n%nWritten by %an [%ae]%nCommitted by %cn [%ce]%n%n%b" #| sed 's|See merge request \(.*\)!\(.*\)$|<a href="https://gitlab.com/\1/-/merge_requests/\2">More information</a>|'
+	COMMITS=$(git blog --exclude-first | grep "current" | sed 's/current://')
+	echo
+	display "title" "Included modifications"
+fi
+
+# ============================ LOGIC ===========================================
 
 function classify {
     # $1 sha-1 of commit
@@ -166,8 +176,14 @@ function find-commit {
     classify $2 "$1" "Unsorted" ""
 }
 
-[[ $# != 0 ]] && display text "Git options: $*"
-COMMITS=$(git log --pretty=format:'%h' $*)
+if [[ $COMMITS == "" ]]; then
+	[[ $# != 0 ]] && display text "Git options: $*"
+	# shellcheck disable=SC2086
+	# shellcheck disable=SC2048
+	COMMITS=$(git log --pretty=format:'%h' $*)
+fi
+
+debug "Will work with commits $COMMITS"
 
 function create {
     for COMMIT in $COMMITS
