@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# === VERBOSITY ===
+# ============================= VERBOSITY ======================================
 
 VERBOSE=0
 [[ $1 = '-v' ]] && VERBOSE=1 && shift
 
 function debug {
-    [[ $VERBOSE = 1 ]] && echo -e $*
+    [[ $VERBOSE = 1 ]] && echo -e "$@"
 }
-debug $*
+debug "$@"
 
-# === DISPLAYING ===
+# ============================ DISPLAYING ======================================
 
 if [[ $1 = "--format" ]]
 then
@@ -99,15 +99,15 @@ function classify {
 }
 
 function angular-clean {
-    echo $* | sed -r 's/^(chore|build|docs|feat|fix|perf|refactor|style|test|breaking|ci)(.*): //'
+    echo "$@" | sed -r 's/^(chore|build|docs|feat|fix|perf|refactor|style|test|breaking|ci)(.*): //'
 }
 
 function angular-scope {
-    echo $* | sed -r -e 's/^(chore|build|docs|feat|fix|perf|refactor|style|test|breaking|ci)\(//' -e 's/\).*$//'
+    echo "$@" | sed -r -e 's/^(chore|build|docs|feat|fix|perf|refactor|style|test|breaking|ci)\(//' -e 's/\).*$//'
 }
 
 function eslint-clean {
-    echo $* | sed -r 's/^(Fix|Update|Breaking|Docs|Build|New|Upgrade): //'
+    echo "$@" | sed -r 's/^(Fix|Update|Breaking|Docs|Build|New|Upgrade): //'
 }
 
 TYPEBUILD="Build"
