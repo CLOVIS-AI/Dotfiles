@@ -1,0 +1,8 @@
+#!/bin/bash
+
+case $1 in
+--tracked)
+	# From https://stackoverflow.com/a/9753364/5666171
+	git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)";;
+
+esac
