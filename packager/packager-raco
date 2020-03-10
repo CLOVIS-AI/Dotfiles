@@ -1,0 +1,56 @@
+#!/bin/bash
+
+case $1 in
+enabled)
+    hash raco      2>/dev/null || (echo "'raco' is not installed."; exit 1)
+    ;;
+name)
+    echo -en "raco"
+    ;;
+install)
+    shift
+    announce "raco pkg install $*"
+    # shellcheck disable=SC2048
+    # shellcheck disable=SC2086
+    raco pkg install $*
+    ;;
+upgrade)
+    shift
+    if [[ $# == 0 ]]
+    then
+        announce "raco pkg update --all"
+        raco pkg update --all
+    else
+        announce "raco pkg update $*"
+        # shellcheck disable=SC2086
+        # shellcheck disable=SC2048
+        raco pkg update $*
+    fi
+    ;;
+purge)
+    shift
+    announce "raco pkg remove --auto $*"
+    # shellcheck disable=SC2048
+    # shellcheck disable=SC2086
+    raco pkg remove --auto $*
+    ;;
+remove)
+    shift
+    announce "raco pkg remove $*"
+    # shellcheck disable=SC2048
+    # shellcheck disable=SC2086
+    raco pkg remove $*
+    ;;
+search)
+    shift
+    announce "This operation is not supported."
+    echo "The official catalogs are:"
+    echo " - https://pkgs.racket-lang.org"
+    echo " - http://planet-compats.racket-lang.org"
+    ;;
+*)
+    announce "Invalid command '$1'."
+    exit 2
+    ;;
+esac
+
