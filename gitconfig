@@ -9,7 +9,6 @@
 [alias]
         aliases = config --get-regexp ^alias\\.
         p = pull --prune --ff-only
-        pi = review -p
         pr = pull --prune --rebase=interactive
         pm = pull --prune --no-rebase
         ps = push
