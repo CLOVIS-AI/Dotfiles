@@ -3,6 +3,8 @@
 CONFIG="$HOME/.config/clovis-probe"
 REMOTES=$(cat "$CONFIG/remotes")
 
+ERRORS=$(mktemp)
+
 declare -A FOUND
 
 number=$(<<<"$REMOTES" wc -l)
@@ -14,14 +16,14 @@ do
 	COMMAND=""
 	[[ $remote != "$HOSTNAME" ]] && COMMAND="ssh -At $remote"
 
-	users=$($COMMAND who | grep -v 'scripts/announce' | cut -d ' ' -f 1 | uniq)
+	users=$($COMMAND who 2>$ERRORS | grep -v 'scripts/announce' | cut -d ' ' -f 1 | uniq)
 	for user in $users
 	do
-		echo "Found user $user here!"
 		if [[ $user == "$USER" ]]
 		then
 			echo -n ""
 		else
+			echo "Found user $user here!"
 			FOUND[$user]="${FOUND[$user]} $remote"
 		fi
 	done
@@ -29,8 +31,14 @@ do
 	i=$((i+1))
 done
 
-announce "Results:"
+announce -n "Results:"
 for user in "${!FOUND[@]}"
 do
 	echo "$user → ${FOUND[$user]}"
 done | column -t
+
+errors=$(cat $ERRORS | grep -v "Connection to .* closed.")
+if [[ $(<<<"$errors" wc -l) == 0 ]]; then
+	announce -n "Errors:"
+	echo "$errors"
+fi
