@@ -14,7 +14,7 @@ function work {
 	read -r line
 	master[0]=$(<<<"$line" cut -d ' ' -f 1)
 	master[1]=$(<<<"$line" cut -d ' ' -f 2)
-	if [[ $EXCLUDE_FIRST ]]; then echo "main:${master[0]}"; else echo "current:${master[0]}"; fi
+	if [[ $EXCLUDE_FIRST+_ ]]; then echo "main:${master[0]}"; else echo "current:${master[0]}"; fi
 	echo "main:${master[1]}"
 
     while IFS="" read -r line; do
