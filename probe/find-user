@@ -35,7 +35,7 @@ announce -n "Results:"
 for user in "${!FOUND[@]}"
 do
 	echo "$user → ${FOUND[$user]}"
-done | column -t
+done | sort | column -t
 
 errors=$(cat $ERRORS | grep -v "Connection to .* closed.")
 if [[ $(<<<"$errors" wc -l) == 0 ]]; then
