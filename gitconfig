@@ -8,9 +8,11 @@
         helper = cache --timeout 1200
 [rerere]
         enabled = true
+[pull]
+        rebase = true
 [alias]
         aliases = config --get-regexp ^alias\\.
-        p = pull --prune --ff-only
+        p = pull --prune --ff-only --no-rebase
         pr = pull --prune --rebase=interactive
         pm = pull --prune --no-rebase
         ps = push
@@ -60,3 +62,5 @@
         rc = rebase --continue
         rs = rebase --skip
         why-ignore = check-ignore -v --no-index
+        policy-merge = "!git config branch.$(git data --current).rebase false"
+        policy-rebase = "!git config branch.$(git data --current).rebase true"
