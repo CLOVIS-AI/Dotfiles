@@ -1,66 +1,65 @@
 [gpg]
-        program = /usr/bin/gpg
+	program = /usr/bin/gpg
 [core]
-        autocrlf = input
-        excludesfile = ~/config/gitignore
-        editor = emacs -nw
+	autocrlf = input
+	excludesfile = ~/config/gitignore
+	editor = emacs -nw
 [credential]
-        helper = cache --timeout 1200
+	helper = cache --timeout 1200
 [rerere]
-        enabled = true
+	enabled = true
 [pull]
-        rebase = true
+	rebase = true
 [alias]
-        aliases = config --get-regexp ^alias\\.
-        p = pull --prune --ff-only --no-rebase
-        pr = pull --prune --rebase=interactive
-        pm = pull --prune --no-rebase
-        ps = push
-        psf = push -f
-        pst = push --tags
-        psu = push --set-upstream
-        psr = "!b=$(git branch | grep \\* | cut -d \" \" -f2); for r in $(git remote); do announce \"Pushing $b to $r\"; git ps $r $b; done"
-        st = status -sb
-        sta = status
-        co = checkout
-        c = commit
-        cm = commit -m
-        ca = commit --amend
-        a = add
-        ap = add -p
-        add-new-files = add --intent-to-add
-        f = fetch -p
-        fr = "!for r in $(git remote); do announce \"Fetching\" $r; git f $r; done"
-        b = branch
-        ba = checkout -b
-        bl = branch -vv
-        bd = branch -d
-        bdr = push -d
-        bdrr = "!f() { b=$1; for r in $(git remote); do announce \"Deleting $b on $r\"; git bdr $r $b; done }; f"
-        bdrra = "!f() { b=$1; announce \"Deleting local branch $1\"; git bd $1; git bdrr $1; }; f"
-        bla = branch -vva
-        d = diff --submodule=diff
-        dc = diff --cached --submodule=diff
-        s = show --show-signature
-        authors = shortlog -sn --no-merges
-        committers = shortlog -esnc --no-merges
-        commiters = shortlog -esnc --no-merges
-        tags = tag --list --sort=-committerdate -n1
-        assume = update-index --assume-unchanged
-        unassume = update-index --no-assume-unchanged
-        assumed = ls-files -v | grep ^h | cut -c 3-
-        cp = cherry-pick
-        rebase-me = !git rebase -i `git merge-base HEAD master`
-        sub = submodule
-        subi = submodule update --init --recursive
-        sti = !git status -s | cat -n
-        stage = "!stage() { git add `git st | sed -n $1p | awk -F' ' '{ print $2 }'`; git st; }; stage"
-        unstage = "!unstage() { git reset HEAD `git st | sed -n $1p | awk -F' ' '{ print $2 }'`; git st; }; unstage"
-        r = remote
-        rr = remote rename
-        ra = rebase --abort
-        rc = rebase --continue
-        rs = rebase --skip
-        why-ignore = check-ignore -v --no-index
-        policy-merge = "!git config branch.$(git data --current).rebase false"
-        policy-rebase = "!git config branch.$(git data --current).rebase true"
+	aliases = config --get-regexp ^alias\\.
+	p = pull --prune --ff-only --no-rebase
+	pr = pull --prune --rebase=interactive
+	pm = pull --prune --no-rebase
+	ps = push
+	psf = push -f
+	pst = push --tags
+	psu = push --set-upstream
+	psr = "!b=$(git branch | grep \\* | cut -d \" \" -f2); for r in $(git remote); do announce \"Pushing $b to $r\"; git ps $r $b; done"
+	st = status -sb
+	sta = status
+	co = checkout
+	c = commit
+	cm = commit -m
+	ca = commit --amend
+	a = add
+	ap = add -p
+	add-new-files = add --intent-to-add
+	f = fetch -p
+	fr = "!for r in $(git remote); do announce \"Fetching\" $r; git f $r; done"
+	b = branch
+	ba = checkout -b
+	bl = branch -vv
+	bd = branch -d
+	bdr = push -d
+	bdrr = "!f() { b=$1; for r in $(git remote); do announce \"Deleting $b on $r\"; git bdr $r $b; done }; f"
+	bdrra = "!f() { b=$1; announce \"Deleting local branch $1\"; git bd $1; git bdrr $1; }; f"
+	bla = branch -vva
+	d = diff --submodule=diff
+	dc = diff --cached --submodule=diff
+	s = show --show-signature
+	authors = shortlog -sn --no-merges
+	committers = shortlog -esnc --no-merges
+	tags = tag --list --sort=-committerdate -n1
+	assume = update-index --assume-unchanged
+	unassume = update-index --no-assume-unchanged
+	assumed = ls-files -v | grep ^h | cut -c 3-
+	cp = cherry-pick
+	rebase-me = !git rebase -i `git merge-base HEAD master`
+	sub = submodule
+	subi = submodule update --init --recursive
+	sti = !git status -s | cat -n
+	stage = "!stage() { git add `git st | sed -n $1p | awk -F' ' '{ print $2 }'`; git st; }; stage"
+	unstage = "!unstage() { git reset HEAD `git st | sed -n $1p | awk -F' ' '{ print $2 }'`; git st; }; unstage"
+	r = remote
+	rr = remote rename
+	ra = rebase --abort
+	rc = rebase --continue
+	rs = rebase --skip
+	why-ignore = check-ignore -v --no-index
+	policy-merge = "!git config branch.$(git data --current).rebase false"
+	policy-rebase = "!git config branch.$(git data --current).rebase true"
