@@ -13,6 +13,7 @@
 [alias]
 	aliases = config --get-regexp ^alias\\.
 	p = pull --prune --ff-only --no-rebase
+	pl = pull --prune
 	pr = pull --prune --rebase=interactive
 	pm = pull --prune --no-rebase
 	ps = push
