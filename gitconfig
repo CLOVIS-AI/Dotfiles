@@ -10,6 +10,8 @@
 	enabled = true
 [pull]
 	rebase = true
+[fetch]
+	recurseSubmodules = on-demand
 [alias]
 	aliases = config --get-regexp ^alias\\.
 	p = pull --prune --ff-only --no-rebase
