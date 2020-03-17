@@ -54,9 +54,6 @@
 	rebase-me = !git rebase -i `git merge-base HEAD master`
 	sub = submodule
 	subi = submodule update --init --recursive
-	sti = !git status -s | cat -n
-	stage = "!stage() { git add `git st | sed -n $1p | awk -F' ' '{ print $2 }'`; git st; }; stage"
-	unstage = "!unstage() { git reset HEAD `git st | sed -n $1p | awk -F' ' '{ print $2 }'`; git st; }; unstage"
 	r = remote
 	rr = remote rename
 	ra = rebase --abort
