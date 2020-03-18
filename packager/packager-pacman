@@ -5,7 +5,7 @@ enabled)
     hash pacman 2>/dev/null || (echo "'pacman' is not installed."; exit 1)
     ;;
 name)
-    echo -n "pacman"
+    echo -n "ArchLinux packages (AUR excluded)"
     ;;
 install)
     shift

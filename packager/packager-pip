@@ -36,7 +36,7 @@ enabled)
     hash pip 2>/dev/null || (echo "'pip' is not installed"; exit 1)
     ;;
 name)
-    echo -n "pip"
+    echo -n "Python dependencies"
     ;;
 install)
     shift

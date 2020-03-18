@@ -5,7 +5,7 @@ enabled)
     hash yay 2>/dev/null || (echo "'yay' is not installed."; exit 1)
     ;;
 name)
-    echo -n "yay"
+    echo -n "ArchLinux packages (AUR included)"
     ;;
 install)
     shift

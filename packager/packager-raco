@@ -5,7 +5,7 @@ enabled)
     hash raco      2>/dev/null || (echo "'raco' is not installed."; exit 1)
     ;;
 name)
-    echo -en "raco"
+    echo -en "Racket dependencies"
     ;;
 install)
     shift

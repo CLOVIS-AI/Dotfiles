@@ -5,7 +5,7 @@ enabled)
     hash aptitude 2>/dev/null || (echo "'aptitude' is not installed."; exit 1)
     ;;
 name)
-    echo -n "aptitude"
+    echo -n "Modern Debian package manager"
     ;;
 install)
     shift

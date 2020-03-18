@@ -16,7 +16,7 @@
 #   If the tool cannot be used, should display an explanation in the standard output..
 #
 # name
-#   Should print the display-name of your tool (eg. 'git'), without trailing end-of-line character (eg. by using 'echo -n your-name').
+#   Should print the description of your tool (eg. 'Racket Package Manager'), without trailing end-of-line character (eg. by using 'echo -n your-name').
 #
 # install [package1] [package2] [...]
 #   Should install the given packages.
