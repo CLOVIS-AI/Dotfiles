@@ -20,6 +20,7 @@
 	algorithm = histogram
 [rebase]
 	autoStash = true
+	missingCommitsCheck = error
 [alias]
 	aliases = config --get-regexp ^alias\\.
 	p = pull --ff-only --no-rebase
