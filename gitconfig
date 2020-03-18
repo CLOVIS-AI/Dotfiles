@@ -18,6 +18,8 @@
 	recurseSubmodules = check
 [diff]
 	algorithm = histogram
+[rebase]
+	autoStash = true
 [alias]
 	aliases = config --get-regexp ^alias\\.
 	p = pull --ff-only --no-rebase
