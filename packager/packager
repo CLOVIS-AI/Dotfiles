@@ -96,19 +96,12 @@ function debug {
 
 # ========================================== L O A D I N G ============================================ #
 
-function test-dependency {
-    hash $1 || (announce "Missing dependency: '$1'"; MISSING=1)
-}
-
 debug "Checking for installation of dependencies..."
-hash announce || (echo "Missing dependency: 'announce' (from clovis-ai/dotfiles)"; MISSING=1)
-test-dependency compgen
+. cl-depend announce "packager"
+. cl-depend compgen "packager"
+. cl-depend announce-menu "packager"
+. announce-menu --import
 debug "All dependencies checked."
-if [[ $MISSING = 1 ]]
-then
-    echo "Failed because of missing dependencies."
-    exit 1
-fi
 
 # ============================================ E X E C ================================================ #
 
@@ -119,7 +112,7 @@ function find-tools {
         if $tool enabled >/dev/null
         then
             debug "Tool $tool is enabled."
-            TOOLS+=($tool)
+            TOOLS+=("${tool/packager-/}:$($tool name)")
         else
             debug "Tool $tool is disabled (if this is abnormal, run '$tool enabled' to get more information.)."
         fi
@@ -127,20 +120,8 @@ function find-tools {
 }
 
 function select-tool {
-    announce "Choose your tool:"
-    INDEX=0
-    for tool in "${TOOLS[@]}"
-    do
-        echo -en " $INDEX. "
-        $tool name
-        echo
-        let INDEX++
-    done
-    
-    announce -nn "Your choice:"
-    read CHOICE
-    
-    TOOL=${TOOLS[$CHOICE]}
+	announce-menu --title "Choose your tool:" "${TOOLS[@]}"
+	TOOL="packager-$(announce-menu-get)"
     debug "Selected tool: '$TOOL'."
 }
 
