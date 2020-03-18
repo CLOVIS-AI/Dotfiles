@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#
+# cl-depend by Ivan Canet
+#
+# Description:
+#	Tests if a program exists on this machine.
+#	Declares cl-error and cl-warning which can be used to display messages.
+#
+# Usage:
+#	. cl-depend [--warn] [--exit EXIT_CODE] <program> [caller]
+#
+# Options:
+#	no options			If missing, write an error message in red, exit with 1.
+#	--warn				If missing, write an error message in yellow, do not exit.
+#	--exit EXIT_CODE	Exit with specified code. Give EXIT_CODE of 'no' to not
+#						exit. Overrides default behavior.
+#	program				The name of the program to search for.
+#	caller				The name of the program calling this script, displayed in
+#						the error/warning message.
+#
+
+function cl-error {
+	echo -en "\e[1;31m$1 ERROR:\e[21m"; shift
+	echo -e " $*\e[39m"
+}
+
+function cl-warning {
+	echo -en "\e[1;33m$1 ERROR:\e[21m"; shift
+	echo -e " $*\e[39m"
+}
+
+COMMAND=cl-error
+EXIT=1
+
+if [[ $1 == "--warn" ]]; then
+	COMMAND=cl-warning
+	EXIT=no
+	shift
+fi
+
+if [[ $1 == "--exit" ]]; then
+	EXIT=$2
+	shift
+fi
+
+if ! hash "$1" 2>/dev/null; then
+	$COMMAND "${2:-"cl-depend"}" "Missing dependency $1"
+	[[ $EXIT != no ]] && exit "$EXIT"
+fi
+
+unset COMMAND
+unset EXIT
