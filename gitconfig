@@ -13,6 +13,8 @@
 [fetch]
 	recurseSubmodules = on-demand
 	parallel = 0
+[diff]
+	algorithm = histogram
 [alias]
 	aliases = config --get-regexp ^alias\\.
 	p = pull --prune --ff-only --no-rebase
