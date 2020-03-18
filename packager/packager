@@ -61,11 +61,12 @@ Description:
 
 General syntax:
     packager help
-    packager [-v] <COMMAND> [packages...]
+    packager [-v] [options] <COMMAND> [packages...]
 
 Options:
     help            Displays this message.
     -v              Displays debug information.
+    --tool TOOL		Use this packager tool instead of ask the user to choose.
 
 Commands:
     i,  install     Installs the given packages.
@@ -127,7 +128,14 @@ function select-tool {
 
 declare -a TOOLS
 find-tools
-select-tool
+
+if [[ $1 == "--tool" ]]; then
+	. cl-depend "$2" "packager"
+	TOOL="$2"
+	shift; shift
+else
+	select-tool
+fi
 
 function find-command {
     case $1 in
