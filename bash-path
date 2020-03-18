@@ -1,7 +1,0 @@
-#
-# Adds the path to the different scripts I'm using in the scripts/ repertory.
-#
-
-CONFIG=${CLOVIS_CONFIG:-$HOME/config}
-
-PATH=$PATH:$CONFIG/scripts:$CONFIG/packager:$CONFIG/probe
