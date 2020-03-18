@@ -19,6 +19,11 @@
 ANNOUNCE_MENU_PATH="/tmp/clovis-announce-$USER"
 [[ $1 == "--file-path" ]] && exec echo "$ANNOUNCE_MENU_PATH"
 
+function announce-menu-get {
+	cat "$ANNOUNCE_MENU_PATH"
+}
+[[ $1 == "--import" ]] && return
+
 [[ $1 == "--chosen" ]] && exec test "$(cat "$ANNOUNCE_MENU_PATH")" == "$2"
 
 if [[ $1 == "--title" ]]
