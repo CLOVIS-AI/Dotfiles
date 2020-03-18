@@ -33,6 +33,7 @@
 	psu = push --set-upstream
 	psr = "!b=$(git branch | grep \\* | cut -d \" \" -f2); for r in $(git remote); do announce \"Pushing $b to $r\"; git ps $r $b; done"
 	st = status -sb
+	stu = status -sb --untracked=all
 	sta = status
 	co = checkout
 	c = commit

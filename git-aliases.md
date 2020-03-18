@@ -27,6 +27,11 @@ Display the status of the project (short):
     git status -sb
     git st
 
+Display the status of the project, including the complete list of untracked files (short):
+
+    git status -sb --untracked=all
+    git stu
+
 Display the status of the project (full):
 
     git status
