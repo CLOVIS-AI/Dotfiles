@@ -20,6 +20,8 @@ Options:
     --no-bash-aliases       Do not source the bash aliases
     --no-bash-prompt        Do not source the bash prompt
     --no-scripts            Do not add the customized scripts to the PATH variable
+    --no-packager           Do not add the packager scripts to the PATH variable
+    --no-probe              Do not add the probe scripts to the PATH variable
     --no-completion         Do not add bash completion
     --no-autofetch          Do not auto-fetch git repositories
     --no-autofetch-config   Do not auto-fetch the configuration repository
@@ -28,6 +30,8 @@ Environment variables:
     CLOVIS_CONFIG_ALIASES   Source the Bash aliases (default: yes)
     CLOVIS_CONFIG_PROMPT    Source the Bash prompt (default: yes)
     CLOVIS_CONFIG_SCRIPTS   Add the scripts to the PATH (default: yes)
+    CLOVIS_CONFIG_PACKAGER  Add the packager scripts to the PATH (default: yes)
+    CLOVIS_CONFIG_PROBE     Add the probe scripts to the PATH (default: yes)
     CLOVIS_CONFIG_COMPLETE  Sets up bash completion (default: yes)
     CLOVIS_CONFIG_AUTOFETCH Autofetches git repositories when entering them (default: yes)
     CLOVIS_CONFIG_AFCONFIG  Autofetches the configuration repository (default: yes)
@@ -61,6 +65,12 @@ do
     --no-scripts)
         CLOVIS_CONFIG_SCRIPTS=no
         ;;
+    --no-packager)
+    	CLOVIS_CONFIG_PACKAGER=no
+    	;;
+ 	--no-probe)
+ 		CLOVIS_CONFIG_PROBE=no
+ 		;;
     --no-completion)
         CLOVIS_CONFIG_COMPLETE=no
         ;;
@@ -101,8 +111,21 @@ if [[ ${CLOVIS_CONFIG_SCRIPTS:-yes} == yes ]]
 then
     debug "Adding the scripts to the PATH variable..."
 
-    # shellcheck source=bash-path
-    . "$CLOVIS_CONFIG"/bash-path
+    PATH="$PATH:$CLOVIS_CONFIG/scripts"
+fi
+
+if [[ ${CLOVIS_CONFIG_PACKAGER:-yes} == yes ]]
+then
+	debug "Adding the packager system to the PATH variable..."
+
+	PATH="$PATH:$CLOVIS_CONFIG/packager"
+fi
+
+if [[ ${CLOVIS_CONFIG_PROBE:-yes} == yes ]]
+then
+	debug "Adding the probe system to the PATH variable..."
+
+	PATH="$PATH:$CLOVIS_CONFIG/probe"
 fi
 
 if [[ ${CLOVIS_CONFIG_COMPLETE:-yes} == yes ]]
