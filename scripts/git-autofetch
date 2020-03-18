@@ -37,6 +37,7 @@ fi
 announce "Automatically fetching the repository $ROOT..."
 echo "To stop autofetching, execute 'git autofetch --ignore'"
 git fetch --all --prune || exit 1
+[[ $(git data --tracked) == "" ]] && exec git autofetch --ignore
 COMMITS=$(git log .."$(git data --tracked)")
 if [[ "$COMMITS" != "" ]]
 then
