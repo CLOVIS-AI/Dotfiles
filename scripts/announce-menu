@@ -6,12 +6,21 @@
 #
 # Usage:
 #	announce-menu [--title TITLE] [--question QUESTION] [--default DEFAULT] <replies...>
-#	announce-menu --file-path
-#	announce-menu --chosen CHOICE
 #
 # Options:
-#	--title			Add a title line.
-#	--question		Override the "Your choice:" question with something else.
+#	--title	TITLE			Add a title line which says TITLE.
+#	--question QUESTION		Override the "Your choice:" question with QUESTION.
+#	--default DEFAULT		Set DEFAULT to be the default value.
+#	--allow-other			Allow the user to input something else than the given responses.
+#
+# Format:
+#	NAME:DESCRIPTION		NAME is the field the user can enter, DESCRIPTION is
+#							an optional field to explain what the choice means.
+#
+# Other usages:
+#	announce-menu --file-path			Print the path where the responses will be stored, and exit.
+#	announce-menu --chosen CHOICE		Did the user choose CHOICE in the last menu?
+#	. announce-menu --import			Add function 'announce-menu-get' which can be used to get the user's response.
 #
 
 # **************************** OPTION HANDLING *********************************
