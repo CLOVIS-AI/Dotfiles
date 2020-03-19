@@ -106,6 +106,7 @@ function announce-do {
 	announce "$ $*"
 	# shellcheck disable=SC2048
 	$*
+	return $!
 }
 
 # ******************************* Local work ***********************************
@@ -124,7 +125,7 @@ function do-local-merge {
 		fi
 	fi
 
-	[[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]] && announce-do git checkout "$TARGET_DISPLAY" || exit 1
+	if [[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]]; then announce-do git checkout "$TARGET_DISPLAY" || exit 1; fi
 	announce-do "$MERGE_COMMAND" --stat $ALLOW_FF "$SOURCE"
 	[[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]] && announce-do git checkout "$CURRENT_BRANCH"
 }
