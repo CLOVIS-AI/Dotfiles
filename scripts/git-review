@@ -92,7 +92,14 @@ function do-diff {
 		return
 	fi
 
-	announce-menu --title "There are $COMMITNUMBER commits." "as one:Review everything at once" "one-by-one:Review each commit separately"
+	if [[ $COMMITNUMBER -le 10 ]]; then
+		echo
+		git changelog "$RANGE"
+	fi
+
+	announce-menu --title "There are $COMMITNUMBER commits." \
+		"as one:Review everything at once" \
+		"one-by-one:Review each commit separately"
 	case $(cat "$ANNOUNCE_CHOICE") in
 	"as one")
 		do-diff-as-one;;
