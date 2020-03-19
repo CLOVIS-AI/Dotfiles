@@ -1,82 +1,54 @@
 #!/bin/bash
 
+. cl-depend announce "git ci"
+. cl-depend announce-menu "git ci"
+. announce-menu --import
+
 FILE=$(mktemp)
 
-announce "Choose your style:"
-echo " 0. Classic"
-echo " 1. BrainDot"
-echo " 2. ESLint"
-announce -nn "Your choice:"
-read -r STYLE
+announce-menu --title "Choose your style:" \
+	"classic:No particular style" \
+	"braindot:BrainDot style" \
+	"eslint:Style used by ESLint projects"
+STYLE=$(announce-menu-get)
 
-function classic {
-    announce -nn "What did you do?"
-    read -r MSG
-    echo "$MSG" >>"$FILE"
+function classic() {
+	announce-menu --question "What did you do?" --allow-other
+	announce-menu-get >>"$FILE"
 }
 
-function braindot {
-    announce "Choose the type:"
-    echo " 0. build      build system, dependencies"
-    echo " 1. ci         CI/CD"
-    echo " 2. docs       documentation changes (internal or public)"
-    echo " 3. feat       new features, backward-compatible"
-    echo " 4. fix        fix problems, backward-compatible"
-    echo " 5. perf       better performances, backward-compatible"
-    echo " 6. refactor   changes to the product, backward-compatible"
-    echo " 7. style      grammar, coding style, linting..."
-    echo " 8. test       new tests, refactoring tests..."
-    echo " 9. breaking   backward-incompatible changes"
-    announce -nn "Your choice:"
-    read -r CHOICE_TYPE
+function braindot() {
+	announce-menu --title "Choose the type:" \
+		"build:build system, dependencies" \
+		"ci:CI/CD" \
+		"docs:documentation changes" \
+		"feat:new features:backward-compatible" \
+		"fix:fix problems:backward-compatible" \
+		"perf:better performances:backward-compatible" \
+		"refactor:internal changes to the implementation:backward-compatible" \
+		"style:grammar, coding style, linting..." \
+		"test:new tests, refactoring tests..." \
+		"breaking:breaking changes:backward-incompatible"
+	TYPE=$(announce-menu-get)
 
-    case $CHOICE_TYPE in
-    0|build)
-        TYPE=build;;
-    1|ci)
-        TYPE=ci;;
-    2|docs)
-        TYPE=docs;;
-    3|feat)
-        TYPE=feat;;
-    4|fix)
-        TYPE=fix;;
-    5|perf)
-        TYPE=perf;;
-    6|refactor)
-        TYPE=refactor;;
-    7|style)
-        TYPE=style;;
-    8|test)
-        TYPE=test;;
-    9|breaking)
-        TYPE=breaking;;
-    *)
-        echo "Wrong input."
-        braindot
-        exit 0;;
-    esac
+	# shellcheck disable=SC2046
+	announce-menu --title "Last used scopes:" --allow-other \
+		$(git log --oneline --abbrev-commit | cut -d ' ' -f 1 --complement | grep --color=auto -E '^(build|ci|docs|feat|fix|perf|refactor|style|test|breaking)\(.*\)' | sed -r -e 's/\).*$//' -e 's/^.*\(//' | awk '!x[$0]++' | head -10)
+	SCOPE=$(announce-menu-get)
 
-    announce "Last used scopes:"
-    for i in $(git log --oneline --abbrev-commit | cut -d ' ' -f 1 --complement | grep --color=auto -E '^(build|ci|docs|feat|fix|perf|refactor|style|test|breaking)\(.*\)' | sed -r -e 's/\).*$//' -e 's/^.*\(//'| awk '!x[$0]++' | head -10)
-    do echo " -  $i"; done
-    announce -nn "Scope of the commit:"
-    read -r SCOPE
+	while true; do
+		echo "    Type your commit message in the past tense"
+		echo " r. Remind me of what I did"
+		announce -nn "What did you do?"
+		read -r MESSAGE
 
-    while true
-    do
-        echo "    Type your commit message in the past tense"
-        echo " r. Remind me of what I did"
-        announce -nn "What did you do?"
-        read -r MESSAGE
-        
-        [[ $MESSAGE != "r" ]] && break
-        git dc
-    done
+		[[ $MESSAGE != "r" ]] && break
+		git dc
+	done
 
-    echo -e "$TYPE($SCOPE): $MESSAGE" >>"$FILE"
+	echo -e "$TYPE($SCOPE): $MESSAGE" >>"$FILE"
 
-    cat >>"$FILE" <<EOF
+	cat >>"$FILE" <<EOF
 
 # Give more details about your changes here:
 
@@ -85,74 +57,41 @@ function braindot {
 EOF
 }
 
-function eslint {
-    announce "Choose the type:"
-    echo " 0. Build      build system, dependencies, CI/CD"
-    echo " 1. Upgrade    dependency upgrades"
-    echo " 2. Docs       documentation changes (internal or public)"
-    echo " 3. New        new features, backward-compatible"
-    echo " 4. Fix        fix problems, backward-compatible"
-    echo " 5. Update     improvements, backward-compatible"
-    echo " 6. Breaking   backward-incompatible changes"
-    announce -nn "Your choice:"
-    read -r CHOICE_TYPE
+function eslint() {
+	announce-menu --title "Choose the type:" \
+		"Build:build system, dependencies, CI/CD" \
+		"Upgrade:dependency upgrades" \
+		"Docs:documentation changes" \
+		"New:new features:backward-compatible" \
+		"Fix:fix problems:backward-compatible" \
+		"Update:improvements:backward-compatible" \
+		"Breaking:changes:backward-incompatible"
+	TYPE=$(announce-menu-get)
 
-    case $CHOICE_TYPE in
-    0|build)
-        TYPE=Build;;
-    1|upgrade)
-        TYPE=Upgrade;;
-    2|docs)
-        TYPE=Docs;;
-    3|feat)
-        TYPE=New;;
-    4|fix)
-        TYPE=Fix;;
-    5|update)
-        TYPE=Update;;
-    6|breaking)
-        TYPE=Breaking;;
-    *)
-        echo "Wrong input."
-        eslint
-        exit 0;;
-    esac
+	announce-menu --question "What did you do?" --allow-other
+	MESSAGE=$(announce-menu-get)
+	echo -n "$MESSAGE" >>"$FILE"
 
-    announce -nn "What did you do?"
-    read -r MESSAGE
-    echo -n "$MESSAGE" >>"$FILE"
-    
-    announce -nn "Fixes (optional):"
-    read -r FIX
-    [[ $FIX != "" ]] && echo -n " (fixes $FIX)" >>"$FILE"
-    
-    announce -nn "References (optional):"
-    read -r REF
-    [[ $REF != "" ]] && echo -n " (refs $REF)" >>"$FILE"
+	announce-menu --question "Fixes issue:" --default "empty" --allow-other
+	FIX=$(announce-menu-get)
+	[[ $FIX != "empty" ]] && echo -n " (fixes $FIX)" >>"$FILE"
 
-    echo >>"$FILE"
+	announce-menu --question "References issue:" --default "empty" --allow-other
+	REF=$(announce-menu-get)
+	[[ $REF != "empty" ]] && echo -n " (refs $REF)" >>"$FILE"
+
+	echo >>"$FILE"
 }
 
-case $STYLE in
-0|classic)
-    classic
-    ;;
-1|braindot)
-    braindot
-    ;;
-2|eslint)
-    eslint
-    ;;
-*)
-    echo "Wrong input."
-    exit 1;;
-esac
+$STYLE
 
 case $1 in
---merge|-m)
-    shift;
-    git merge -v --file="$FILE" --edit "$@";;
---commit|-c|*)
-    shift
-    git commit --file="$FILE" --edit "$@";;
+--merge | -m)
+	shift
+	git merge -v --file="$FILE" --edit "$@"
+	;;
+--commit | -c | *)
+	shift
+	git commit --file="$FILE" --edit "$@"
+	;;
 esac
