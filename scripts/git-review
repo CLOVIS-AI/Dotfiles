@@ -40,21 +40,20 @@ function select-branch() {
 
 	CHOICE_DISPLAY=$(cat "$ANNOUNCE_CHOICE")
 	# shellcheck disable=SC2001
-	CHOICE_REMOTE="$(<<<"$CHOICE_DISPLAY" sed 's|/.*||')"
+	CHOICE_REMOTE="$(sed <<<"$CHOICE_DISPLAY" 's|/.*||')"
 	# shellcheck disable=SC2001
-	CHOICE="$(<<<"$CHOICE_DISPLAY" sed "s|$CHOICE_REMOTE/||")"
+	CHOICE="$(sed <<<"$CHOICE_DISPLAY" "s|$CHOICE_REMOTE/||")"
 
 	[[ $CHOICE == "$CHOICE_REMOTE" ]] && CHOICE_REMOTE=""
 }
 
 # ********************************* Diff ***************************************
 
-function do-diff-as-one {
+function do-diff-as-one() {
 	git diff "$TARGET_DISPLAY".."$SOURCE_DISPLAY"
 
-	announce-menu --question "Accept?" --default "no" "yes" "no"
-	if announce-menu --chosen "yes"
-	then
+	announce-menu --title "Accept?" --default "no" "yes" "no"
+	if announce-menu --chosen "yes"; then
 		echo "Accepted."
 	else
 		echo "Aborting..."
@@ -66,11 +65,8 @@ function do-diff-one-by-one() {
 	for COMMIT in $COMMITS; do
 		git show --show-signature "$COMMIT"
 
-		announce-menu --question "Accept?" --default "no" "yes" "no"
-		if announce-menu --chosen "yes"
-		then
-			echo "Accepted commit $COMMIT."
-		else
+		announce-menu --title "Accept $COMMIT?" --default "no" "yes" "no"
+		if announce-menu --chosen "no"; then
 			echo "Aborting..."
 			exit 0
 		fi
@@ -78,9 +74,11 @@ function do-diff-one-by-one() {
 	announce "You accepted all commits."
 }
 
-function do-diff {
-	COMMITS=$(git log --reverse --pretty=format:'%h' "$TARGET_DISPLAY".."$SOURCE_DISPLAY")
-	COMMITNUMBER="$(<<<"$COMMITS" wc -w)"
+function do-diff() {
+	RANGE="$TARGET_DISPLAY..$SOURCE_DISPLAY"
+
+	COMMITS=$(git log --reverse --pretty=format:'%h' "$RANGE")
+	COMMITNUMBER="$(wc <<<"$COMMITS" -w)"
 
 	if [[ $COMMITNUMBER -eq 0 ]]; then
 		announce "The two branches are identical, there is nothing to do."
@@ -102,14 +100,15 @@ function do-diff {
 		"one-by-one:Review each commit separately"
 	case $(cat "$ANNOUNCE_CHOICE") in
 	"as one")
-		do-diff-as-one;;
+		do-diff-as-one
+		;;
 	"one-by-one")
-		do-diff-one-by-one;;
+		do-diff-one-by-one
+		;;
 	esac
 }
 
-
-function announce-do {
+function announce-do() {
 	announce "$ $*"
 	# shellcheck disable=SC2048
 	$*
@@ -118,15 +117,13 @@ function announce-do {
 
 # ******************************* Local work ***********************************
 
-function do-local-merge {
+function do-local-merge() {
 	ALLOW_FF="--no-ff"
-	if git merge-base --is-ancestor "$TARGET_DISPLAY" "$SOURCE"
-	then
+	if git merge-base --is-ancestor "$TARGET_DISPLAY" "$SOURCE"; then
 		announce-menu --title "Your branches can be fast-forwarded, do you want to?" \
 			"yes:The branches will kept as they are" \
 			"no:A new empty commit will be created"
-		if announce-menu --chosen "yes"
-		then
+		if announce-menu --chosen "yes"; then
 			ALLOW_FF="--ff-only"
 			MERGE_COMMAND="git merge"
 		fi
@@ -137,7 +134,7 @@ function do-local-merge {
 	[[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]] && announce-do git checkout "$CURRENT_BRANCH"
 }
 
-function do-local-rebase {
+function do-local-rebase() {
 	[[ ! $CURRENT_BRANCH == "$SOURCE" ]] && announce-do git checkout "$SOURCE" || exit 1
 
 	announce-do git rebase -i "$TARGET" || (announce "Could not rebase automatically, after finishing the rebase manually you will need to fast-forward $SOURCE onto $TARGET (you can run 'git review' again to do it)" && exit 1)
@@ -149,11 +146,9 @@ function do-local-rebase {
 	[[ ! $CURRENT_BRANCH == "$TARGET" ]] && announce-do git checkout "$CURRENT_BRANCH"
 }
 
-function do-rebase-from-remote {
-	if git show-ref --verify --quiet refs/heads/"$SOURCE"
-	then
-		if [[ $(git rev-parse "$SOURCE") != $(git rev-parse "$SOURCE_DISPLAY") ]]
-		then
+function do-rebase-from-remote() {
+	if git show-ref --verify --quiet refs/heads/"$SOURCE"; then
+		if [[ $(git rev-parse "$SOURCE") != $(git rev-parse "$SOURCE_DISPLAY") ]]; then
 			announce-menu --title "A local branch called $SOURCE exists and is different from $SOURCE_DISPLAY." \
 				"overwrite:Reset $SOURCE so it's exactly the same as $SOURCE_DISPLAY" \
 				"give up:Give up the review, do not touch anything."
@@ -165,15 +160,14 @@ function do-rebase-from-remote {
 	do-local-rebase
 }
 
-function do-local-squash {
+function do-local-squash() {
 	[[ ! $CURRENT_BRANCH == "$TARGET" ]] && announce-do git checkout "$TARGET_DISPLAY" || exit 1
 	announce-do "$MERGE_COMMAND" --stat --squash "$TARGET_DISPLAY"
 	[[ ! $CURRENT_BRANCH == "$TARGET" ]] && announce-do git checkout "$CURRENT_BRANCH"
 }
 
-function do-local-work {
-	if [[ $1 == "--from-remote" ]]
-	then
+function do-local-work() {
+	if [[ $1 == "--from-remote" ]]; then
 		FROM_REMOTE="true"
 	fi
 
@@ -183,31 +177,33 @@ function do-local-work {
 		"squash:Not recommended because of the loss of history"
 	case $(cat "$ANNOUNCE_CHOICE") in
 	"merge")
-		do-local-merge;;
+		do-local-merge
+		;;
 	"rebase")
 		if [[ $FROM_REMOTE == "true" ]]; then
 			do-rebase-from-remote
 		else
 			do-local-rebase
-		fi;;
+		fi
+		;;
 	"squash")
-		do-local-squash;;
+		do-local-squash
+		;;
 	esac
 }
 
-function strat-local-local {
+function strat-local-local() {
 	do-diff
 	do-local-work
 }
 
-function strat-local-remote {
+function strat-local-remote() {
 	(announce-do git fetch "$TARGET_REMOTE" --prune) || announce "Could not fetch, continuing anyway..."
 	do-diff
 
 	PUSH_OPTIONS=""
 	[[ $CURRENT_BRANCH != "$SOURCE" ]] && announce-do git checkout "$SOURCE"
-	if git rev-list --count "$TARGET_DISPLAY".."$SOURCE" -geq 1
-	then
+	if git rev-list --count "$TARGET_DISPLAY".."$SOURCE" -geq 1; then
 		announce-menu --title "$SOURCE is ahead $TARGET_DISPLAY, you cannot push." \
 			"force:Force-push and overwrite the remote branch (unsafe!)" \
 			"give up:Do not do anything."
@@ -218,7 +214,7 @@ function strat-local-remote {
 	[[ $CURRENT_BRANCH != "$SOURCE" ]] && announce-do git checkout "$CURRENT_BRANCH"
 }
 
-function strat-remote-local {
+function strat-remote-local() {
 	announce-do git fetch "$SOURCE_REMOTE" --prune || announce "Could not fetch, continuing anyway..."
 	do-diff
 	do-local-work --from-remote
@@ -243,14 +239,11 @@ TARGET_DISPLAY=$CHOICE_DISPLAY
 
 echo
 announce "Okay, I will take commits from '$SOURCE_DISPLAY' and put them in '$TARGET_DISPLAY'"
-if [[ $SOURCE_REMOTE == "" && $TARGET_REMOTE == "" ]]
-then
+if [[ $SOURCE_REMOTE == "" && $TARGET_REMOTE == "" ]]; then
 	strat-local-local
-elif [[ $SOURCE_REMOTE == "" && ! $TARGET_REMOTE == "" ]]
-then
+elif [[ $SOURCE_REMOTE == "" && ! $TARGET_REMOTE == "" ]]; then
 	strat-local-remote
-elif [[ $TARGET_REMOTE == "" ]]
-then
+elif [[ $TARGET_REMOTE == "" ]]; then
 	strat-remote-local
 else
 	announce "Sorry, I can't handle two remote branches at the moment."
