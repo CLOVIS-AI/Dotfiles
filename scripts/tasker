@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [[ $1 == "--dir" ]]; then
+	options+=" --workdir $2 "
+	shift
+	shift
+fi
+announce "Starting '$*' in a new tab..."
+command=". ~/config/selector.sh"
+command+=" && announce Welcome to Tasker"
+command+=" && echo Running: $* && echo"
+command+=" && $*"
+command+=" && exit"
+echo "Options: $options"
+konsole $options --new-tab -e "$SHELL" -c "$command" 2>/dev/null &
