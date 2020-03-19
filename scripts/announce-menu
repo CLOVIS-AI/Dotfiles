@@ -48,6 +48,13 @@ then
 	shift
 fi
 
+unset ALLOW_OTHER
+if [[ $1 == "--allow-other" ]]
+then
+	ALLOW_OTHER=yes
+	shift
+fi
+
 # ****************************** DISPLAYING ************************************
 
 declare -A CHOICES
@@ -72,6 +79,7 @@ do
 	display-int "$input"
 done
 echo -e "$ANSWERS" | column -t -s ':' | less -rFX
+[[ $ALLOW_OTHER == "yes" ]] && echo "You can type your own comment."
 
 # ******************************* QUESTION *************************************
 
@@ -89,6 +97,8 @@ do
 	else
 		CHOICE=${CHOICES[$REPLY]}
 	fi
+
+	[[ $CHOICE == "" && $ALLOW_OTHER == "yes" ]] && CHOICE=$REPLY
 done
 
 echo "$CHOICE" >"$ANNOUNCE_MENU_PATH"
