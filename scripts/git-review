@@ -234,6 +234,7 @@ SOURCE_DISPLAY=$CHOICE_DISPLAY
 
 DEFAULT="master"
 [[ $TRACKED_BRANCH != "" ]] && DEFAULT=$TRACKED_BRANCH
+[[ $SOURCE_REMOTE != "" ]] && DEFAULT=$CURRENT_BRANCH
 echo
 select-branch "In which branch do you want to put those commits?" "$DEFAULT"
 TARGET_REMOTE=$CHOICE_REMOTE
