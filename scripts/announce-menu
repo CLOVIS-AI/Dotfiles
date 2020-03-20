@@ -23,6 +23,8 @@
 #	. announce-menu --import			Add function 'announce-menu-get' which can be used to get the user's response.
 #
 
+CLOVIS_ANNOUNCE_MENU_CALL="<|> $*"
+
 # **************************** OPTION HANDLING *********************************
 
 ANNOUNCE_MENU_PATH="/tmp/clovis-announce-$USER"
@@ -64,6 +66,20 @@ then
 	shift
 fi
 
+# **************************** FINDING MEMORIES ********************************
+
+ANNOUNCE_CACHE_PATH="$HOME/.cache/clovis/announce-menu-cache.txt"
+ANNOUNCE_FINDINGS_PATH="/tmp/clovis-announce-$USER-findings"
+
+mkdir -p "$(dirname ANNOUNCE_CACHE_PATH)" || exit 1
+touch "$ANNOUNCE_CACHE_PATH" || exit 1
+
+if <"$ANNOUNCE_CACHE_PATH" grep "$CLOVIS_ANNOUNCE_MENU_CALL" >"$ANNOUNCE_FINDINGS_PATH" 2>/dev/null; then
+	FOUND=$(<"$ANNOUNCE_FINDINGS_PATH" sed 's/<|>.*//')
+fi
+
+[[ $DEFAULT == "" && $FOUND != "" ]] && DEFAULT="${FOUND}"
+
 # ****************************** DISPLAYING ************************************
 
 declare -A CHOICES
@@ -77,7 +93,14 @@ function clean-word {
 i=0
 function display-int {
 	clean-word "$1"
-	ANSWERS+="$i.:$1\n"
+
+	if [[ $FOUND == "$WORD" ]]; then
+		ANSWERS+="\e[1m"
+	else
+		ANSWERS+="\e[0m"
+	fi
+
+	ANSWERS+="$i.:$1\e[0m\n"
 	CHOICES[$i]="$WORD"
 	CHOICES[$WORD]="$WORD"
 	i=$((i+1))
@@ -111,3 +134,9 @@ do
 done
 
 echo "$CHOICE" >"$ANNOUNCE_MENU_PATH"
+
+if [[ $FOUND == "" ]]; then
+	echo "$CHOICE$CLOVIS_ANNOUNCE_MENU_CALL" >>"$ANNOUNCE_CACHE_PATH"
+elif [[ $FOUND != "$CHOICE" ]]; then
+	sed -i "s\\.*$CLOVIS_ANNOUNCE_MENU_CALL\\$CHOICE$CLOVIS_ANNOUNCE_MENU_CALL\\" "$ANNOUNCE_CACHE_PATH"
+fi
