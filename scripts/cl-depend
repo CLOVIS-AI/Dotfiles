@@ -21,8 +21,15 @@
 #
 
 function cl-error {
+	if [[ $1 == "--exit" ]]; then
+		QUIT=$2
+		shift; shift
+	fi
+
 	echo -en "\e[1;31m$1 ERROR:\e[21m"; shift
 	echo -e " $*\e[39m"
+
+	[[ ${QUIT} != "" ]] && exit "$QUIT"
 }
 
 function cl-warning {
