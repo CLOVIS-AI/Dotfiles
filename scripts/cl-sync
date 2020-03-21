@@ -1,0 +1,46 @@
+#!/bin/bash
+
+. cl-depend sshfs "cl-sync"
+. cl-depend fusermount3 "cl-sync"
+. cl-depend unison "cl-sync"
+
+function help() {
+    cat <<EOL
+cl-sync - by Ivan Canet
+
+Description:
+	Syncs a local directory with a directory available via SSH.
+
+Usage:
+	cl-sync LOCAL REMOTE
+	cl-sync --help
+
+Options:
+	--help		Display this page
+	LOCAL		A local directory
+	REMOTE		A directory available via SSH
+EOL
+	exit 0
+}
+
+[[ $1 == "--help" ]] && help
+
+LOCAL_PATH="$1"
+REMOTE_PATH="$2"
+
+SYNC_DIR="/tmp/clovis-sync-$USER-$REMOTE_PATH"
+
+[[ $LOCAL_PATH == "" ]] && help
+[[ $REMOTE_PATH == "" ]] && help
+
+announce "Mounting remote filesystem..."
+mkdir -p "$SYNC_DIR"
+sshfs "$REMOTE_PATH" "$SYNC_DIR" || cl-error --exit 1 "cl-sync" "Could not mount the remote filesystem."
+
+announce "Syncing files..."
+unison "$LOCAL_PATH" "$SYNC_DIR" -auto || cl-error --exit 1 "cl-sync" "Could not sync the files."
+
+announce "Unmounting filesystem..."
+fusermount3 -u "$SYNC_DIR" || cl-error "cl-sync" "Could not unmount the filesystem."
+
+announce "Sync finished."
