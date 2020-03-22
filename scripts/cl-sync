@@ -33,12 +33,12 @@ SYNC_DIR="/tmp/clovis-sync-$USER-$REMOTE_PATH"
 [[ $LOCAL_PATH == "" ]] && help
 [[ $REMOTE_PATH == "" ]] && help
 
-announce "Mounting remote filesystem..."
+announce "Mounting remote filesystem $LOCAL_PATH → $REMOTE_PATH..."
 mkdir -p "$SYNC_DIR"
 sshfs "$REMOTE_PATH" "$SYNC_DIR" || cl-error --exit 1 "cl-sync" "Could not mount the remote filesystem."
 
 announce "Syncing files..."
-unison "$LOCAL_PATH" "$SYNC_DIR" -auto || cl-error --exit 1 "cl-sync" "Could not sync the files."
+unison "$LOCAL_PATH" "$SYNC_DIR" -auto || cl-error "cl-sync" "Could not sync the files."
 
 announce "Unmounting filesystem..."
 fusermount3 -u "$SYNC_DIR" || cl-error "cl-sync" "Could not unmount the filesystem."
