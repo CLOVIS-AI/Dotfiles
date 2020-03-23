@@ -68,10 +68,11 @@ fi
 
 # **************************** FINDING MEMORIES ********************************
 
-ANNOUNCE_CACHE_PATH="$HOME/.cache/clovis/announce-menu-cache.txt"
+ANNOUNCE_CACHE_PATH_DIR="$HOME/.cache/clovis"
+ANNOUNCE_CACHE_PATH="$ANNOUNCE_CACHE_PATH_DIR/announce-menu-cache.txt"
 ANNOUNCE_FINDINGS_PATH="/tmp/clovis-announce-$USER-findings"
 
-mkdir -p "$(dirname ANNOUNCE_CACHE_PATH)" || exit 1
+mkdir -p "$ANNOUNCE_CACHE_PATH_DIR" || exit 1
 touch "$ANNOUNCE_CACHE_PATH" || exit 1
 
 if <"$ANNOUNCE_CACHE_PATH" grep "$CLOVIS_ANNOUNCE_MENU_CALL" >"$ANNOUNCE_FINDINGS_PATH" 2>/dev/null; then
