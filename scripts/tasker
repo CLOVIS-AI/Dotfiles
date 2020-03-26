@@ -11,5 +11,6 @@ command+=" && announce Welcome to Tasker"
 command+=" && echo Running: $* && echo"
 command+=" && $*"
 command+=" && exit"
-echo "Options: $options"
+command+=" || echo -e 'Something went wrong, press enter to close.' && read"
+# shellcheck disable=SC2086
 konsole $options --new-tab -e "$SHELL" -c "$command" 2>/dev/null &
