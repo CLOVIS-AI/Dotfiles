@@ -1,11 +1,14 @@
 #!/bin/bash
 
+. cl-depend announce "tasker"
+
 if [[ $1 == "--dir" ]]; then
 	options+=" --workdir $2 "
 	shift
 	shift
 fi
-announce "Starting '$*' in a new tab..."
+
+echo " → Starting '$*' with options '$options'"
 command=". ~/config/selector.sh"
 command+=" && announce Welcome to Tasker"
 command+=" && echo Running: $* && echo"
