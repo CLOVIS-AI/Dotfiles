@@ -60,6 +60,7 @@ search)
     echo " 0. All packages"
     echo " 1. Installed packages"
     echo " 2. Search for a file"
+    echo " 3. List files owned by a package"
     announce -nn "Your choice:"
     read -r CHOICE
     case $CHOICE in
@@ -75,6 +76,10 @@ search)
         announce "yay -F $*"
         yay -F $*
         ;;
+    3|files)
+    	announce "yay -Ql $*"
+    	yay -Ql $*
+    	;;
     esac
     ;;
 *)
