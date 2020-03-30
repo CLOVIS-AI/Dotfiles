@@ -149,20 +149,18 @@ function find-command {
         COMMAND=search
         ;;
     remove|r|purge|p)
-        announce "Are you sure you want to completely remove the packages?"
-        echo " y. Yes, delete everything, including uneeded dependencies and configuration."
-        echo " r. No, remove the packages but keep the dependencies and configuration."
-        echo " n. No, don't do anything."
-        announce -nn "Your choice: (y/r/N)"
-        read -r CHOICE
-        case $CHOICE in
-        y|yes|p|purge)
+    	announce-menu --title "Are you sure you want to completely remove the packages?" \
+    		"yes:Yes, delete everything, including uneeded dependencies and configuration." \
+    		"keep:No, remove the packages but keep the dependencies and configuration." \
+    		"no:No, don't do anything."
+        case $(announce-menu-get) in
+        yes)
             COMMAND=purge
             ;;
-        r|remove)
+    	keep)
             COMMAND=remove
             ;;
-        *)
+        no)
             announce "Stopping."
             exit 0
             ;;
