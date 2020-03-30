@@ -52,7 +52,7 @@ function select-branch() {
 function do-diff-as-one() {
 	git diff "$TARGET_DISPLAY".."$SOURCE_DISPLAY"
 
-	announce-menu --title "Accept?" --default "no" "yes" "no"
+	announce-menu --title "Accept?" "yes" "no"
 	if announce-menu --chosen "yes"; then
 		echo "Accepted."
 	else
@@ -65,7 +65,7 @@ function do-diff-one-by-one() {
 	for COMMIT in $COMMITS; do
 		git show --show-signature "$COMMIT"
 
-		announce-menu --title "Accept $COMMIT?" --default "no" "yes" "no"
+		announce-menu --title "Accept $COMMIT?" "yes" "no"
 		if announce-menu --chosen "no"; then
 			echo "Aborting..."
 			exit 0
