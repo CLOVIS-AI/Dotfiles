@@ -103,8 +103,8 @@ if [[ ${CLOVIS_CONFIG_PROMPT:-yes} == yes ]]
 then
     debug "Sourcing the Bash prompt..."
 
-    # shellcheck source=bash-prompt
-    . "$CLOVIS_CONFIG"/bash-prompt
+    # shellcheck source=bash-prompt.sh
+    . "$CLOVIS_CONFIG"/bash-prompt.sh
 fi
 
 if [[ ${CLOVIS_CONFIG_SCRIPTS:-yes} == yes ]]
