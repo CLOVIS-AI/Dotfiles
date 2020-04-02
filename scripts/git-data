@@ -8,6 +8,15 @@ case $1 in
 --tracked)
 	# From https://stackoverflow.com/a/9753364/5666171
 	git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)";;
+--root)
+	git rev-parse --show-toplevel;;
+--git-dir)
+	git rev-parse --git-dir;;
+--is-merging)
+	git rev-parse -q --verify MERGE_HEAD >/dev/null;;
+--is-rebasing)
+	# shellcheck disable=SC2010
+	ls "$(git data --git-dir)" | grep rebase >/dev/null;;
 --current)
 	git rev-parse --abbrev-ref HEAD;;
 --ahead-after|--status)
