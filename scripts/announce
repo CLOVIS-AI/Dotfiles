@@ -29,10 +29,21 @@ if [[ $SSH_CLIENT != "" ]]; then
 	ssh_name=" ‹\e[32m$USER \e[36m$HOSTNAME\e[0m›"
 fi
 
+root_arrow="\e[31m⮕"
 if [[ $EUID == 0 ]]; then
-	arrow="\e[31m⮕"
+	arrow=$root_arrow
 else
 	arrow="\e[0m→"
 fi
 
+if [[ $1 == "run" ]]; then
+	shift
+	and_exec="$*"
+elif [[ $1 == "sudo" ]]; then
+	shift
+	and_exec="sudo $*"
+	arrow=$root_arrow
+fi
+
 echo -e $PARAMS "$ssh_name $arrow \e[34m$* \e[0m"
+$and_exec
