@@ -1,81 +1,108 @@
 #!/bin/bash
 
-function ask-mode {
-    [[ "$VIRTUAL_ENV" == "" ]]; IN_ENV=$?
+. cl-depend announce "packager-pip"
+. cl-depend announce-menu "packager-pip"
+. announce-menu --import
 
-    announce "PIP can be ran as root or as user, which do you want?"
-    echo " r. root, system-wide packages"
-    echo " u. user, for personnal packages"
-    [[ "$IN_ENV" == 1 ]] && echo " v. virtual environment"
-    announce -nn "Your choice: (r/U/v)"
-    read -r CHOICE
-    
-    case $CHOICE in
-    r|root)
-    	MODE="sudo"
-        PIP="pip"
-        AS_USER=""
-        ;;
-    v|virtual)
-        if [[ "$IN_ENV" == 1 ]]
-        then
-        	MODE="run"
-            PIP="pip"
-            AS_USER=""
-        else
-            announce "Not running in a virtual environment, please try again."
-            ask-mode
-        fi;;
-    *)
-    	MODE="run"
-        PIP="pip"
-        AS_USER="--user";;
-    esac
+function ask-mode() {
+	[[ "$VIRTUAL_ENV" == "" ]]
+	IN_ENV=$?
+
+	announce-menu --title "How do you want to run PIP?" \
+		"root:System-wide packages" \
+		"user:Personnal packages" \
+		"virtual:This project only"
+	case $(announce-menu-get) in
+	r | root)
+		MODE="sudo"
+		PIP="pip"
+		AS_USER=""
+		;;
+	v | virtual)
+		if [[ "$IN_ENV" != 1 ]]; then
+			activate=$(find . -name 'activate')
+			# shellcheck disable=SC2086
+			announce-menu --title "Not running in a virtual environment. Do you want to activate one?" \
+				$activate \
+				"create:Create a new virtual environment"
+			if announce-menu --chosen "create"; then
+				announce-menu --title "Where do you want to create it?" --allow-other \
+					"$PWD/env:Here, named 'env'" \
+					"$PWD/venv:Here, named 'venv'"
+				choice=$(announce-menu-get)
+				announce run python3 -m venv "$choice"
+				activate="$choice/bin/activate"
+			fi
+			announce "Activating the environment..."
+			# shellcheck disable=SC1090
+			. "$activate"
+		fi
+		MODE="run"
+		PIP="pip"
+		AS_USER=""
+		;;
+	*)
+		MODE="run"
+		PIP="pip"
+		AS_USER="--user"
+		;;
+	esac
 }
 
 case $1 in
 enabled)
-    hash python3 2>/dev/null || (echo "'python3' is not installed."; exit 1)
-    hash pip 2>/dev/null || (echo "'pip' is not installed"; exit 1)
-    ;;
+	hash python3 2>/dev/null || (
+		echo "'python3' is not installed."
+		exit 1
+	)
+	hash pip 2>/dev/null || (
+		echo "'pip' is not installed"
+		exit 1
+	)
+	;;
 name)
-    echo -n "Python dependencies"
-    ;;
+	echo -n "Python dependencies"
+	;;
 install)
-    shift
-    ask-mode
-    if [[ $# == 0 ]]
-    then
-        announce $MODE "$PIP install $AS_USER -r requirements.txt"
-    else
-        announce $MODE "PIP install $AS_USER $*"
-    fi
-    ;;
+	shift
+	ask-mode
+	if [[ $# == 0 ]]; then
+		requirements=$(find . -name requirements.txt)
+		if [[ $(wc <<<"$requirements" -l) != 1 ]]; then
+			# shellcheck disable=SC2086
+			announce-menu --title "Choose which file to install packages from:" \
+				$requirements
+			requirements=$(announce-menu-get)
+		fi
+		announce $MODE "$PIP install $AS_USER -r $requirements"
+	else
+		announce $MODE "$PIP install $AS_USER $*"
+	fi
+	;;
 upgrade)
-    shift
-    ask-mode
-    if [[ $# -eq 0 ]]
-    then
-        announce $MODE "$PIP list --outdated"
-        announce "The above packages can be updated. Call 'packager upgrade <package name>' to upgrade them."
-    else
-        announce $MODE "$PIP install $AS_USER --upgrade $*"
-    fi
-    ;;
+	shift
+	ask-mode
+	if [[ $# -eq 0 ]]; then
+		announce $MODE "$PIP list --outdated"
+		announce "The above packages can be updated. Call 'packager upgrade <package name>' to upgrade them."
+	else
+		announce $MODE "$PIP install $AS_USER --upgrade $*"
+	fi
+	;;
 clean)
-    announce "Nothing to do on PIP."
-    ;;
-remove|purge)
-    shift
-    ask-mode
-    announce $MODE "$PIP uninstall $AS_USER $*"
-    ;;
+	announce "Nothing to do on PIP."
+	;;
+remove | purge)
+	shift
+	ask-mode
+	announce $MODE "$PIP uninstall $AS_USER $*"
+	;;
 search)
-    shift
-    announce "Not implemented yet. Please submit a merge request at https://gitlab.com/clovis-ai/dotfiles"
-    ;;
+	shift
+	announce "Not implemented yet. Please submit a merge request at https://gitlab.com/clovis-ai/dotfiles"
+	;;
 *)
-    announce "Invalid command '$1'."
-    exit 2
-    ;;
+	announce "Invalid command '$1'."
+	exit 2
+	;;
 esac

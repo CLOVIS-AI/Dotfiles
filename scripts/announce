@@ -1,28 +1,24 @@
 #!/bin/bash
 
-if [[ $1 == "complete" ]]
-then
-    complete -o nosort -W "-n --newline-before -r --erase -nn --no-newline-after" announce
+if [[ $1 == "complete" ]]; then
+	complete -o nosort -W "-n --newline-before -r --erase -nn --no-newline-after" announce
 
-    return
+	return
 fi
 
-if [[ $1 == "-n" || $1 == "--newline-before" ]]
-then
-    echo
-    shift
+if [[ $1 == "-n" || $1 == "--newline-before" ]]; then
+	echo
+	shift
 fi
 
-if [[ $1 == "-r" || $1 == "--erase" ]]
-then
-    echo -ne "\033[2K\r"
-    shift
+if [[ $1 == "-r" || $1 == "--erase" ]]; then
+	echo -ne "\033[2K\r"
+	shift
 fi
 
-if [[ $1 == "-nn" || $1 == "--no-newline-after" ]]
-then
-    PARAMS="-n"
-    shift
+if [[ $1 == "-nn" || $1 == "--no-newline-after" ]]; then
+	PARAMS="-n"
+	shift
 fi
 
 if [[ $SSH_CLIENT != "" ]]; then
@@ -43,6 +39,10 @@ elif [[ $1 == "sudo" ]]; then
 	shift
 	and_exec="sudo $*"
 	arrow=$root_arrow
+fi
+
+if [[ $VIRTUAL_ENV != "" ]]; then
+	arrow="⚕ $arrow"
 fi
 
 echo -e $PARAMS "$ssh_name $arrow \e[34m$* \e[0m"
