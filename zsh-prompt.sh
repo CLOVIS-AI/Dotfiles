@@ -4,6 +4,8 @@
 autoload colors
 colors
 precmd() {
+	git autofetch
+
 	PS1=''
 
 	# Display username and hostname only when connected via SSH
