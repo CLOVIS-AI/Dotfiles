@@ -10,4 +10,19 @@ case $1 in
 	git for-each-ref --format='%(upstream:short)' "$(git symbolic-ref -q HEAD)";;
 --current)
 	git rev-parse --abbrev-ref HEAD;;
+--ahead-after|--status)
+	git data --check-repo || exit 0
+	current="$(git data --current 2>/dev/null)"
+	[[ $? == 128 ]] && echo "no branch" && exit 0
+	tracked="$(git data --tracked)"
+
+	RET="${current}"
+	git data --is-merging && RET+=" merge"
+	git data --is-rebasing && RET+=" rebase"
+	RET+=" $(git rev-list "$tracked..$current" | wc -l)↑"
+	RET+=" $(git rev-list "$current..$tracked" | wc -l)↓"
+	# shellcheck disable=SC2001
+	<<<"$RET" \
+		sed 's/ 0↑ 0↓/ ⮁/;s/ 0[↑↓]//g;s/ merge/ ⤮ currently merging/;s/ rebase/ ⟳ currently rebasing/;
+		s/HEAD/detached HEAD/';;
 esac
