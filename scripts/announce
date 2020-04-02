@@ -25,4 +25,8 @@ then
     shift
 fi
 
-echo -e $PARAMS "\e[48;5;16m[ \e[94m${USER}@${HOSTNAME}\e[39m ]\e[0m\e[48;5;233m $* \e[0m"
+if [[ $SSH_CLIENT != "" ]]; then
+	ssh_name=" ‹\e[32m$USER \e[36m$HOSTNAME\e[0m›"
+fi
+
+echo -e $PARAMS "$ssh_name \e[0m→ \e[34m$* \e[0m"
