@@ -12,21 +12,24 @@ function ask-mode {
     
     case $CHOICE in
     r|root)
-        PIP="sudo pip"
-        USER=""
+    	MODE="sudo"
+        PIP="pip"
+        AS_USER=""
         ;;
     v|virtual)
         if [[ "$IN_ENV" == 1 ]]
         then
+        	MODE="run"
             PIP="pip"
-            USER=""
+            AS_USER=""
         else
             announce "Not running in a virtual environment, please try again."
             ask-mode
         fi;;
     *)
+    	MODE="run"
         PIP="pip"
-        USER="--user";;
+        AS_USER="--user";;
     esac
 }
 
@@ -43,24 +46,20 @@ install)
     ask-mode
     if [[ $# == 0 ]]
     then
-        announce "pip install -r requirements.txt"
-        $PIP install -r $USER requirements.txt
+        announce $MODE "$PIP install $AS_USER -r requirements.txt"
     else
-        announce "pip install $*"
-        $PIP install $USER $*
+        announce $MODE "PIP install $AS_USER $*"
     fi
     ;;
 upgrade)
     shift
+    ask-mode
     if [[ $# -eq 0 ]]
     then
-        announce "pip list --outdated"
-        pip list --outdated
+        announce $MODE "$PIP list --outdated"
         announce "The above packages can be updated. Call 'packager upgrade <package name>' to upgrade them."
     else
-        ask-mode
-        announce "pip install $USER --upgrade $*"
-        $PIP install $USER --upgrade $*
+        announce $MODE "$PIP install $AS_USER --upgrade $*"
     fi
     ;;
 clean)
@@ -69,8 +68,7 @@ clean)
 remove|purge)
     shift
     ask-mode
-    announce "pip uninstall $*"
-    $PIP uninstall $USER $*
+    announce $MODE "$PIP uninstall $AS_USER $*"
     ;;
 search)
     shift

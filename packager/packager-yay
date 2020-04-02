@@ -13,15 +13,12 @@ name)
     ;;
 install)
     shift
-    announce "yay -S --needed $*"
-    yay -S --needed $*
+    announce run "yay -S --needed $*"
     ;;
 upgrade)
     shift
-    announce "yay -Syyuu $*"
-    yay -Syyuu $*
-    announce "yay -Fy"
-    yay -Fy
+    announce run "yay -Syyuu $*"
+    announce run "yay -Fy"
     ;;
 clean)
     announce "Unneeded/orphan packages:"
@@ -36,22 +33,18 @@ clean)
     	"no:Do not clean the cache"
     case $(announce-menu-get) in
     uninstalled)
-        announce "yay -Sc"
-        yay -Sc;;
+        announce run "yay -Sc";;
     full)
-        announce "yay -Scc"
-        yay -Scc;;
+        announce run "yay -Scc";;
     esac
     ;;
 remove)
     shift
-    announce "yay -R $*"
-    yay -R --confirm $*
+    announce run "yay -R --confirm $*"
     ;;
 purge)
     shift
-    announce "yay -Rncs $*"
-    yay -Rncs --confirm $*
+    announce run "yay -Rncs --confirm $*"
     ;;
 search)
     shift
@@ -62,20 +55,16 @@ search)
     	"files:Which files owns this package?"
     case $(announce-menu-get) in
     all)
-        announce "yay -Ss $*"
-        yay -Ss $*
+        announce run "yay -Ss $*"
         ;;
     installed)
-        announce "yay -Qi $*"
-        yay -Qi $*
+        announce run "yay -Qi $*"
         ;;
     file)
-        announce "yay -F $*"
-        yay -F $*
+        announce run "yay -F $*"
         ;;
     files)
-    	announce "yay -Ql $*"
-    	yay -Ql $*
+    	announce run "yay -Ql $*"
     	;;
     esac
     ;;

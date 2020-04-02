@@ -10,40 +10,31 @@ name)
     ;;
 install)
     shift
-    announce "apt install $*"
-    sudo apt install $*
+    announce sudo "apt install $*"
     ;;
 upgrade)
     shift
     if [[ $# = 0 ]]
     then
-        announce "apt update"
-        sudo apt update
-        announce "apt --with-new-pkgs --autoremove upgrade"
-        sudo apt upgrade
+        announce sudo "apt update"
+        announce sudo "apt --with-new-pkgs --autoremove upgrade"
     else
-        announce "apt install --only-upgrade $*"
-        sudo apt install --only-upgrade $*
+        announce sudo "apt install --only-upgrade $*"
     fi
     ;;
 purge)
     shift
-    announce "apt remove --purge $*"
-    sudo apt remove --purge $*
-    announce "apt autoremove --purge"
-    sudo apt autoremove
+    announce sudo "apt remove --purge $*"
+    announce sudo "apt autoremove --purge"
     ;;
 remove)
     shift
-    announce "apt remove $*"
-    sudo apt remove $*
-    announce "apt autoremove"
-    sudo apt autoremove
+    announce sudo "apt remove $*"
+    announce sudo "apt autoremove"
     ;;
 search)
     shift
-    announce "apt-cache search $*"
-    apt-cache search $*
+    announce run "apt-cache search $*"
     ;;
 *)
     announce "Invalid command '$1'."

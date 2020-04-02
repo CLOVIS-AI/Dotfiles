@@ -9,15 +9,12 @@ name)
     ;;
 install)
     shift
-    announce "pacman -S --needed $*"
-    sudo pacman -S --needed $*
+    announce sudo "pacman -S --needed $*"
     ;;
 upgrade)
     shift
-    announce "pacman -Syyuu $*"
-    sudo pacman -Syyuu $*
-    announce "pacman -Fy"
-    sudo pacman -Fy
+    announce sudo "pacman -Syyuu $*"
+    announce sudo "pacman -Fy"
     ;;
 clean)
     announce "Unneeded/orphan packages:"
@@ -26,7 +23,7 @@ clean)
     read -r CHOICE
     case $CHOICE in
     y|Y)
-        packager remove "$(pacman -Qdt)"
+        packager --tool packager-pacman remove "$(pacman -Qdt)"
         ;;
     esac
     announce "Cleaning of the package cache:"
@@ -37,22 +34,18 @@ clean)
     read -r CHOICE
     case $CHOICE in
     u)
-        announce "pacman -Sc"
-        sudo pacman -Sc;;
+        announce sudo "pacman -Sc";;
     i)
-        announce "pacman -Scc"
-        sudo pacman -Scc;;
+        announce sudo "pacman -Scc";;
     esac
     ;;
 remove)
     shift
-    announce "pacman -R $*"
-    sudo pacman -R --confirm $*
+    announce sudo "pacman -R --confirm $*"
     ;;
 purge)
     shift
-    announce "pacman -Rncs $*"
-    sudo pacman -Rncs --confirm $*
+    announce sudo "pacman -Rncs --confirm $*"
     ;;
 search)
     shift
@@ -64,16 +57,13 @@ search)
     read -r CHOICE
     case $CHOICE in
     0|a|all)
-        announce "pacman -Ss $*"
-        pacman -Ss $*
+        announce sudo "pacman -Ss $*"
         ;;
     1|i|installed)
-        announce "pacman -Qi $*"
-        pacman -Qi $*
+        announce sudo "pacman -Qi $*"
         ;;
     2|f|file)
-        announce "pacman -F $*"
-        pacman -F $*
+        announce sudo "pacman -F $*"
         ;;
     esac
     ;;

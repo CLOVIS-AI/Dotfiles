@@ -9,17 +9,14 @@ name)
     ;;
 install)
     shift
-    announce "aptitude install $*"
-    sudo aptitude install $*
+    announce sudo "aptitude install $*"
     ;;
 upgrade)
     shift
     if [[ $# = 0 ]]
     then
-        announce "aptitude update"
-        sudo aptitude update
-        announce "aptitude safe-upgrade"
-        sudo aptitude safe-upgrade
+        announce sudo "aptitude update"
+        announce sudo "aptitude safe-upgrade"
     else
         announce "Cannot upgrade only selected packages."
         exit 1
@@ -27,18 +24,15 @@ upgrade)
     ;;
 purge)
     shift
-    announce "aptitude purge $*"
-    sudo aptitude purge $*
+    announce sudo "aptitude purge $*"
     ;;
 remove)
     shift
-    announce "aptitude remove $*"
-    sudo apt remove $*
+    announce sudo "aptitude remove $*"
     ;;
 search)
     shift
-    announce "aptitude search $*"
-    aptitude search $*
+    announce run "aptitude search $*"
     ;;
 *)
     announce "Invalid command '$1'."

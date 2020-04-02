@@ -9,37 +9,24 @@ name)
     ;;
 install)
     shift
-    announce "raco pkg install $*"
-    # shellcheck disable=SC2048
-    # shellcheck disable=SC2086
-    raco pkg install $*
+    announce run "raco pkg install $*"
     ;;
 upgrade)
     shift
     if [[ $# == 0 ]]
     then
-        announce "raco pkg update --all"
-        raco pkg update --all
+        announce run "raco pkg update --all"
     else
-        announce "raco pkg update $*"
-        # shellcheck disable=SC2086
-        # shellcheck disable=SC2048
-        raco pkg update $*
+        announce run "raco pkg update $*"
     fi
     ;;
 purge)
     shift
-    announce "raco pkg remove --auto $*"
-    # shellcheck disable=SC2048
-    # shellcheck disable=SC2086
-    raco pkg remove --auto $*
+    announce run "raco pkg remove --auto $*"
     ;;
 remove)
     shift
-    announce "raco pkg remove $*"
-    # shellcheck disable=SC2048
-    # shellcheck disable=SC2086
-    raco pkg remove $*
+    announce run "raco pkg remove $*"
     ;;
 search)
     shift
