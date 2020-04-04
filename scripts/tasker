@@ -16,4 +16,4 @@ command+=" && $*"
 command+=" && exit"
 command+=" || echo -e 'Something went wrong, press enter to close.' && read"
 # shellcheck disable=SC2086
-konsole $options --new-tab -e "$SHELL" -c "$command" 2>/dev/null &
+konsole $options --new-tab -e "$(command -v bash)" -c "$command" 2>/dev/null &

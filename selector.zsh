@@ -3,8 +3,8 @@
 [[ ! -v CLOVIS_CONFIG ]] && CLOVIS_CONFIG=~/config
 
 function source-selector-sh() {
-    emulate -L bash
-    builtin source "$@"
+	emulate -L bash
+	builtin source "$@"
 }
 
 source-selector-sh "$CLOVIS_CONFIG"/selector.sh --no-completion --no-autofetch --no-autofetch-config "$@"
