@@ -18,6 +18,8 @@ setopt autocd
 
 # Use Emacs key bindings
 bindkey -e
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
 
 # Options and traps defined in functions are local
 setopt localoptions localtraps
