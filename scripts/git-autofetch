@@ -1,5 +1,7 @@
 #!/bin/bash
 
+git data --check-repo 2>/dev/null || exit 0
+
 fetch_head=$(git data --git-dir)/FETCH_HEAD
 [[ ! -f "$fetch_head" ]] && should_fetch=true
 
@@ -11,13 +13,16 @@ if [[ $should_fetch != true ]]; then
 	[[ $diff -gt 600 ]] && should_fetch=true
 fi
 
-[[ $should_fetch != true ]] && exit 0
-
-announce "Automatically fetching the repository $(git data --root)..."
-git fetch --all --prune || exit 1
-[[ $(git data --tracked) == "" ]] && exit 0
-COMMITS=$(git log .."$(git data --tracked)")
-if [[ "$COMMITS" != "" ]]; then
+if [[ $should_fetch == true ]]; then
+	announce "Automatically fetching the repository $(git data --root)..."
+	git fetch --all --prune || exit 1
 	echo
-	git changelog .."$(git data --tracked)"
+fi
+
+if [[ $should_fetch == true || $1 == "--changelog" ]]; then
+	[[ $(git data --tracked) == "" ]] && exit 0
+	COMMITS=$(git log .."$(git data --tracked)")
+	if [[ "$COMMITS" != "" ]]; then
+		git changelog .."$(git data --tracked)"
+	fi
 fi
