@@ -117,14 +117,9 @@ function announce-do() {
 
 function do-local-merge() {
 	ALLOW_FF="--no-ff"
-	if git merge-base --is-ancestor "$TARGET_DISPLAY" "$SOURCE"; then
-		announce-menu --title "Your branches can be fast-forwarded, do you want to?" \
-			"yes:The branches will kept as they are" \
-			"no:A new empty commit will be created"
-		if announce-menu --chosen "yes"; then
-			ALLOW_FF="--ff-only"
-			MERGE_COMMAND="git merge"
-		fi
+	if [[ $1 == "fastforward" ]]; then
+		ALLOW_FF="--ff-only"
+		MERGE_COMMAND="git merge"
 	fi
 
 	if [[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]]; then announce-do git checkout "$TARGET_DISPLAY" || exit 1; fi
@@ -169,11 +164,19 @@ function do-local-work() {
 		FROM_REMOTE="true"
 	fi
 
+	if git merge-base --is-ancestor "$TARGET_DISPLAY" "$SOURCE"; then
+		fastforward="fastforward:The branches will be kept as they are"
+	fi
+
 	announce-menu --title "Which strategy do you want to use?" \
-		"merge:Easiest, keeps both branches" \
-		"rebase:Not for beginners, copies the commits onto the target" \
-		"squash:Not recommended because of the loss of history"
+		"$fastforward" \
+		"merge:A merge commit will be created" \
+		"rebase:Copies the commits onto the selected branch" \
+		"squash:Combines all commits into a single one (looses history information)"
 	case $(cat "$ANNOUNCE_CHOICE") in
+	"fastforward")
+		do-local-merge fastforward
+		;;
 	"merge")
 		do-local-merge
 		;;
