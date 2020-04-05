@@ -130,7 +130,7 @@ function do-local-merge() {
 	fi
 
 	if [[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]]; then announce-do git checkout "$TARGET_DISPLAY" || exit 1; fi
-	announce-do "$MERGE_COMMAND" --stat $ALLOW_FF "$SOURCE"
+	announce-do "$MERGE_COMMAND" --stat $ALLOW_FF "$SOURCE_DISPLAY"
 	[[ ! $CURRENT_BRANCH == "$TARGET_DISPLAY" ]] && announce-do git checkout "$CURRENT_BRANCH"
 }
 
