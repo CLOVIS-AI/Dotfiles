@@ -12,6 +12,9 @@
 MERGE_COMMAND="git merge"
 hash compgen 2>/dev/null && compgen -A command "git-ci" >/dev/null && MERGE_COMMAND="git ci --merge"
 
+. cl-depend announce "git review"
+. cl-depend announce-menu "git review"
+. announce-menu --import
 ANNOUNCE_CHOICE=$(announce-menu --file-path)
 
 LOCAL_BRANCHES=$(git for-each-ref refs/heads --format='%(refname)' | sed 's|refs/heads/||')
