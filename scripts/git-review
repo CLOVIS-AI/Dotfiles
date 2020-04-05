@@ -109,9 +109,7 @@ function do-diff() {
 }
 
 function announce-do() {
-	announce "$ $*"
-	# shellcheck disable=SC2048
-	$*
+	announce run "$*"
 	return $!
 }
 
