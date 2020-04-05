@@ -1,48 +1,23 @@
 #!/bin/bash
 
-TMP="/tmp/clovis-git-autofetch-$USER"
-[[ ! -f "$TMP" ]] && touch "$TMP"
+fetch_head=$(git data --git-dir)/FETCH_HEAD
+[[ ! -f "$fetch_head" ]] && should_fetch=true
 
-VERBOSE=0
-[[ ${1:-no} == "--verbose" ]] && VERBOSE=1
+if [[ $should_fetch != true ]]; then
+	last_fetch=$(stat -c %Y "$fetch_head")
+	now=$(date +%s)
+	diff=$((now - last_fetch))
 
-function debug {
-    [[ $VERBOSE == 1 ]] && echo -e "$*"
-}
-
-ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-if [[ "$ROOT" == "" ]]
-then
-    debug "Not in a git repository."
-    exit 0
-fi
-debug "Current project root: $ROOT"
-
-
-if [[ "$1" == "--ignore" ]]
-then
-    echo "Will not autofetch for this session."
-    echo "$ROOT" >>"$TMP"
-    exit 0
+	[[ $diff -gt 600 ]] && should_fetch=true
 fi
 
-if <"$TMP" grep "$ROOT" >/dev/null
-then
-    debug "Project has already been autofetch'd recently."
-    exit 0
-else
-    debug "Project has not been autofetch'd recently."
-fi
+[[ $should_fetch != true ]] && exit 0
 
-announce "Automatically fetching the repository $ROOT..."
-echo "To stop autofetching, execute 'git autofetch --ignore'"
+announce "Automatically fetching the repository $(git data --root)..."
 git fetch --all --prune || exit 1
-[[ $(git data --tracked) == "" ]] && exec git autofetch --ignore
+[[ $(git data --tracked) == "" ]] && exit 0
 COMMITS=$(git log .."$(git data --tracked)")
-if [[ "$COMMITS" != "" ]]
-then
-    echo
-    git changelog .."$(git data --tracked)"
+if [[ "$COMMITS" != "" ]]; then
+	echo
+	git changelog .."$(git data --tracked)"
 fi
-
-git autofetch --ignore
