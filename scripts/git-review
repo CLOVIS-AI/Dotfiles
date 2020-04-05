@@ -90,7 +90,7 @@ function do-diff() {
 		return
 	fi
 
-	if [[ $COMMITNUMBER -le 10 ]]; then
+	if [[ $COMMITNUMBER -le 20 ]]; then
 		echo
 		git changelog "$RANGE"
 	fi
