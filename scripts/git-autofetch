@@ -13,16 +13,33 @@ if [[ $should_fetch != true ]]; then
 	[[ $diff -gt 600 ]] && should_fetch=true
 fi
 
+function fetch() {
+	git fetch --prune "$remote"
+}
+
+forcefetch="$(git data --git-dir)/.cl-forcefetch-"
+for remote in $(git remote); do
+	if [[ -f "${forcefetch}$remote" ]]; then
+		announce "Last automatic fetch on $remote failed, let's try again."
+		fetch "$remote"
+		rm -f "${forcefetch}$remote"
+	fi
+done
+
+changelog_next_time="$(git data --git-dir)/.cl-changelog-next-time"
+[[ -f $changelog_next_time ]] && changelog_this_time=true
 if [[ $should_fetch == true ]]; then
-	announce "Automatically fetching the repository $(git data --root)..."
-	git fetch --all --prune || exit 1
-	echo
+	for remote in $(git remote); do
+		fetch "$remote" >/dev/null 2>/dev/null || touch "$forcefetch$remote" &
+	done
+	touch "$changelog_next_time"
 fi
 
-if [[ $should_fetch == true || $1 == "--changelog" ]]; then
+if [[ $changelog_this_time == true || $1 == "--changelog" ]]; then
 	[[ $(git data --tracked) == "" ]] && exit 0
 	COMMITS=$(git log .."$(git data --tracked)")
 	if [[ "$COMMITS" != "" ]]; then
 		git changelog .."$(git data --tracked)"
+		rm -f "$changelog_next_time"
 	fi
 fi
