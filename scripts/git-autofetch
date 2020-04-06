@@ -29,6 +29,7 @@ done
 changelog_next_time="$(git data --git-dir)/.cl-changelog-next-time"
 [[ -f $changelog_next_time ]] && changelog_this_time=true
 if [[ $should_fetch == true ]]; then
+	echo "Automatically fetching remotes..."
 	for remote in $(git remote); do
 		fetch "$remote" >/dev/null 2>/dev/null || touch "$forcefetch$remote" &
 	done
