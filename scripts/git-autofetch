@@ -36,10 +36,12 @@ if [[ $should_fetch == true ]]; then
 fi
 
 if [[ $changelog_this_time == true || $1 == "--changelog" ]]; then
-	[[ $(git data --tracked) == "" ]] && exit 0
-	COMMITS=$(git log .."$(git data --tracked)")
+	tracked=$(git data --tracked)
+	[[ $tracked == "" ]] && exit 0
+	git data --remote-branch-exists || exit 0
+	COMMITS=$(git log .."$tracked")
 	if [[ "$COMMITS" != "" ]]; then
-		git changelog .."$(git data --tracked)"
+		git changelog .."$tracked"
 		rm -f "$changelog_next_time"
 	fi
 fi

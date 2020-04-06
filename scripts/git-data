@@ -23,6 +23,15 @@ function is_rebasing() {
 	ls "$(git data --git-dir)" | grep rebase >/dev/null
 }
 
+function remote_branch_exists() {
+	if [[ $2 == "" ]]; then
+		branch="$1"
+	else
+		branch="$1/$2"
+	fi
+	git show-branch "remotes/$branch" >/dev/null 2>/dev/null
+}
+
 case $1 in
 --check-repo)
 	check_repo
@@ -45,17 +54,23 @@ case $1 in
 --is-rebasing)
 	is_rebasing
 	;;
+--remote-branch-exists)
+	shift
+	remote_branch_exists "$@"
+	;;
 --ahead-after | --status)
 	check_repo || exit 0
 	current="$(current 2>/dev/null)"
 	[[ $? == 128 ]] && echo "no branch" && exit 0
 	tracked="$(tracked)"
+	tracked_exists=$(remote_branch_exists "$tracked" && echo "true")
 
 	RET="${current}"
 	is_merging && RET+=" merge"
 	is_rebasing && RET+=" rebase"
-	RET+=" $(git rev-list "$tracked..$current" | wc -l)↑"
-	RET+=" $(git rev-list "$current..$tracked" | wc -l)↓"
+	[[ $tracked_exists == "true" ]] && RET+=" $(git rev-list "$tracked..$current" | wc -l)↑"
+	[[ $tracked_exists == "true" ]] && RET+=" $(git rev-list "$current..$tracked" | wc -l)↓"
+	[[ $tracked_exists != "true" ]] && RET+=" × gone"
 	# shellcheck disable=SC2001
 	sed <<<"$RET" \
 		's/ 0↑ 0↓/ ⮁/;

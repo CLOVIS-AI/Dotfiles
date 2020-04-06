@@ -29,8 +29,8 @@ precmd() {
 	PS1+='%(?..%F{red} %?)'
 
 	# Git status
-	SED_PATTERN='s/^/ %F{yellow}/;'                                                     # Yellow
-	SED_PATTERN+='s/[0-9]*↑/%F{green}&/;s/[0-9]*↓/%F{yellow}&/;s/⮁/%F{default}&/' # Ahead-after
+	SED_PATTERN='s/^/ %F{yellow}/;'                                                                    # Yellow
+	SED_PATTERN+='s/[0-9]*↑/%F{green}&/;s/[0-9]*↓/%F{yellow}&/;s/⮁/%F{default}&/;s/×/%F{red}&/' # Ahead-after
 	PS1+="$(git data --status | sed "$SED_PATTERN")"
 
 	# Root or normal user?
