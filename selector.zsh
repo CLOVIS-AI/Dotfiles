@@ -7,7 +7,7 @@ function source-selector-sh() {
 	builtin source "$@"
 }
 
-source-selector-sh "$CLOVIS_CONFIG"/selector.sh --no-completion --no-autofetch --no-autofetch-config "$@"
+source-selector-sh "$CLOVIS_CONFIG"/selector.sh --no-completion --no-autofetch "$@"
 
 # Completion
 autoload -Uz compinit
