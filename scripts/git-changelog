@@ -89,7 +89,7 @@ unset COMMITS
 if [[ $1 == "--incoming" ]]
 then
 	shift
-	git show -s --format="%s%n%nWritten by %an [%ae]%nCommitted by %cn [%ce]%n%n%b" #| sed 's|See merge request \(.*\)!\(.*\)$|<a href="https://gitlab.com/\1/-/merge_requests/\2">More information</a>|'
+	git show -s --format="%s%n%nWritten by %an [%ae]%nCommitted by %cn [%ce]%n%n%b" | sed 's|See merge request \(.*\)!\(.*\)$|More information: https://gitlab.com/\1/-/merge_requests/\2|'
 	COMMITS=$(git blog --exclude-first | grep "current" | sed 's/current://')
 	echo
 	display "title" "Included modifications"
