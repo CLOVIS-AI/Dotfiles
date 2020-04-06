@@ -70,7 +70,8 @@ case $1 in
 	is_rebasing && RET+=" rebase"
 	[[ $tracked_exists == "true" ]] && RET+=" $(git rev-list "$tracked..$current" | wc -l)↑"
 	[[ $tracked_exists == "true" ]] && RET+=" $(git rev-list "$current..$tracked" | wc -l)↓"
-	[[ $tracked_exists != "true" ]] && RET+=" × gone"
+	[[ $tracked_exists != "true" && $tracked != "" ]] && RET+=" × gone"
+	[[ $tracked_exists != "true" && $tracked == "" ]] && RET+=" ×"
 	# shellcheck disable=SC2001
 	sed <<<"$RET" \
 		's/ 0↑ 0↓/ ⮁/;
