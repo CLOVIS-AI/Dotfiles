@@ -2,6 +2,8 @@
 
 git data --check-repo 2>/dev/null || exit 0
 
+[[ $1 == "--changelog" ]] && changelog_this_time=true
+
 fetch_head=$(git data --git-dir)/FETCH_HEAD
 [[ ! -f "$fetch_head" ]] && should_fetch=true
 
@@ -23,6 +25,7 @@ for remote in $(git remote); do
 		announce "Last automatic fetch on $remote failed, let's try again."
 		fetch "$remote"
 		rm -f "${forcefetch}$remote"
+		changelog_this_time=true
 	fi
 done
 
@@ -36,10 +39,10 @@ if [[ $should_fetch == true ]]; then
 	touch "$changelog_next_time"
 fi
 
-if [[ $changelog_this_time == true || $1 == "--changelog" ]]; then
+if [[ $changelog_this_time == "true" ]]; then
 	tracked=$(git data --tracked)
 	[[ $tracked == "" ]] && exit 0
-	git data --remote-branch-exists || exit 0
+	git data --remote-branch-exists "$tracked" || exit 0
 	COMMITS=$(git log .."$tracked")
 	if [[ "$COMMITS" != "" ]]; then
 		git changelog .."$tracked"
