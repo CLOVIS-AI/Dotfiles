@@ -30,38 +30,34 @@ CLOVIS_ANNOUNCE_MENU_CALL="<|> $*"
 ANNOUNCE_MENU_PATH="/tmp/clovis-announce-$USER"
 [[ $1 == "--file-path" ]] && exec echo "$ANNOUNCE_MENU_PATH"
 
-function announce-menu-get {
+function announce-menu-get() {
 	cat "$ANNOUNCE_MENU_PATH"
 }
 [[ $1 == "--import" ]] && return
 
 [[ $1 == "--chosen" ]] && exec test "$(cat "$ANNOUNCE_MENU_PATH")" == "$2"
 
-if [[ $1 == "--title" ]]
-then
+if [[ $1 == "--title" ]]; then
 	announce "$2"
 	shift
 	shift
 fi
 
 QUESTION="Your choice:"
-if [[ $1 == "--question" ]]
-then
+if [[ $1 == "--question" ]]; then
 	QUESTION="$2"
 	shift
 	shift
 fi
 
-if [[ $1 == "--default" ]]
-then
+if [[ $1 == "--default" ]]; then
 	DEFAULT="$2"
 	shift
 	shift
 fi
 
 unset ALLOW_OTHER
-if [[ $1 == "--allow-other" ]]
-then
+if [[ $1 == "--allow-other" ]]; then
 	ALLOW_OTHER=yes
 	shift
 fi
@@ -75,8 +71,8 @@ ANNOUNCE_FINDINGS_PATH="/tmp/clovis-announce-$USER-findings"
 mkdir -p "$ANNOUNCE_CACHE_PATH_DIR" || exit 1
 touch "$ANNOUNCE_CACHE_PATH" || exit 1
 
-if <"$ANNOUNCE_CACHE_PATH" grep "$CLOVIS_ANNOUNCE_MENU_CALL" >"$ANNOUNCE_FINDINGS_PATH" 2>/dev/null; then
-	FOUND=$(<"$ANNOUNCE_FINDINGS_PATH" sed 's/<|>.*//')
+if grep <"$ANNOUNCE_CACHE_PATH" "$CLOVIS_ANNOUNCE_MENU_CALL\$" >"$ANNOUNCE_FINDINGS_PATH" 2>/dev/null; then
+	FOUND=$(sed <"$ANNOUNCE_FINDINGS_PATH" 's/<|>.*//')
 fi
 
 [[ $DEFAULT == "" && $FOUND != "" ]] && DEFAULT="${FOUND}"
@@ -86,13 +82,13 @@ fi
 declare -A CHOICES
 ANSWERS=""
 
-function clean-word {
+function clean-word() {
 	# shellcheck disable=SC2001
-	WORD=$(<<<"$1" sed 's|:.*||')
+	WORD=$(sed <<<"$1" 's|:.*||')
 }
 
 i=0
-function display-int {
+function display-int() {
 	clean-word "$1"
 
 	if [[ $FOUND == "$WORD" ]]; then
@@ -104,11 +100,10 @@ function display-int {
 	ANSWERS+="$i.:$1\e[0m\n"
 	CHOICES[$i]="$WORD"
 	CHOICES[$WORD]="$WORD"
-	i=$((i+1))
+	i=$((i + 1))
 }
 
-for input in "$@"
-do
+for input in "$@"; do
 	display-int "$input"
 done
 echo -e "$ANSWERS" | column -t -s ':' | less -rFX
@@ -118,14 +113,12 @@ echo -e "$ANSWERS" | column -t -s ':' | less -rFX
 
 CHOICE=""
 
-while [[ $CHOICE == "" ]]
-do
+while [[ $CHOICE == "" ]]; do
 	announce -nn "$QUESTION${DEFAULT+ ($DEFAULT)}"
 	read -r REPLY
 	REPLY=${REPLY:-$DEFAULT}
 
-	if [[ $REPLY == "" || ${CHOICES[REPLY]+_} ]]
-	then
+	if [[ $REPLY == "" || ${CHOICES[REPLY]+_} ]]; then
 		echo "Wrong input, please try again."
 	else
 		CHOICE=${CHOICES[$REPLY]}
