@@ -1,6 +1,6 @@
-FROM alpine:latest
+FROM archlinux:latest
 
-RUN apk --no-cache --update add git openssh curl bash coreutils
+RUN pacman -Sy --noconfirm git openssh curl bash
 
 SHELL ["/bin/bash", "-c"]
 
