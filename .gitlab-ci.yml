@@ -7,7 +7,7 @@ variables:
   RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
   TAG_IMAGE: $CI_REGISTRY_NAME:$CI_COMMIT_REF_NAME
 
-docker-build: &docker-build
+.docker-build:
   image: docker:latest
   services:
     - docker:dind
@@ -16,13 +16,13 @@ docker-build: &docker-build
   tags:
     - docker
 
-docker-build-pure: &docker-build-pure
-  <<: *docker-build
+.docker-build-pure:
+  extends: .docker-build
   variables:
     GIT_STRATEGY: none
 
 docker:
-  <<: *docker-build
+  extends: .docker-build
   script:
     - docker pull $RELEASE_IMAGE || true
     - >
@@ -45,7 +45,7 @@ telegram:
     - master
 
 docker-latest:
-  <<: *docker-build-pure
+  extends: .docker-build-pure
   stage: release
   script:
     - docker pull $TEST_IMAGE
@@ -55,7 +55,7 @@ docker-latest:
     - master
 
 docker-tag:
-  <<: *docker-build-pure
+  extends: .docker-build-pure
   stage: release
   script:
     - docker pull $TEST_IMAGE
