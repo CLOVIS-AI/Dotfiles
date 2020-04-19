@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+command -v kscript >/dev/null 2>&1 || curl -L "https://git.io/fpF1K" | bash 1>&2
+exec kscript "$@"
