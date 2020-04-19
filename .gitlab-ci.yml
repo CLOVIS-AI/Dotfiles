@@ -34,6 +34,7 @@ docker:
       --cache-from $RELEASE_IMAGE
       --tag $TEST_IMAGE
       -f $CI_PROJECT_DIR/Dockerfile
+      .
     - docker push $TEST_IMAGE
 
 telegram:
