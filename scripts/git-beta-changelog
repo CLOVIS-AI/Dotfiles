@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+ensure_kscript "${CLOVIS_CONFIG:-$HOME/config}"/kotlin/changelog.kts "$@"
