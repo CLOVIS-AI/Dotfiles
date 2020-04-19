@@ -1,23 +1,67 @@
 stages:
   - docker
-  - announce
+  - release
 
-build-docker:
+variables:
+  TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+  TAG_IMAGE: $CI_REGISTRY_NAME:$CI_COMMIT_REF_NAME
+
+.docker-build:
+  image: docker:19.03
+  services:
+    - docker:dind
+  before_script:
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+  tags:
+    - docker
+
+.docker-build-pure:
+  extends: .docker-build
+  variables:
+    GIT_STRATEGY: none
+
+docker:
+  extends: .docker-build
   stage: docker
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
   script:
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  only:
-    - master
+    - docker pull $RELEASE_IMAGE || true
+    - >
+      docker build
+      --pull
+      --build-arg VCS_REF=$CI_COMMIT_SHA
+      --build-arg VCS_URL=$CI_PROJECT_URL
+      --cache-from $RELEASE_IMAGE
+      --tag $TEST_IMAGE
+      -f $CI_PROJECT_DIR/Dockerfile
+      .
+    - docker push $TEST_IMAGE
 
 telegram:
-  stage: announce
-  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  stage: release
+  image: $TEST_IMAGE
   script:
     - git changelog --format telegram-html --since yesterday >chlog
     - announce-telegram chlog "$CHAT_IDS"
   only:
     - master
+
+docker-latest:
+  extends: .docker-build-pure
+  stage: release
+  script:
+    - docker pull $TEST_IMAGE
+    - docker tag $TEST_IMAGE $RELEASE_IMAGE
+    - docker push $RELEASE_IMAGE
+  only:
+    - master
+
+docker-tag:
+  extends: .docker-build-pure
+  stage: release
+  script:
+    - docker pull $TEST_IMAGE
+    - docker tag $TEST_IMAGE $TAG_IMAGE
+    - docker push $TAG_IMAGE
+  only:
+    - tags
