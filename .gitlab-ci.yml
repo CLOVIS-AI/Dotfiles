@@ -23,6 +23,7 @@ variables:
 
 docker:
   extends: .docker-build
+  stage: docker
   script:
     - docker pull $RELEASE_IMAGE || true
     - >
