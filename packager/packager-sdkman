@@ -1,11 +1,14 @@
 #!/bin/bash
 
 function ensure_sdkman() {
-	if ! command -v sdk; then
-		if [[ ! -f "$HOME/.sdkman/bin/sdkman-init.sh" ]]; then
+	_sdkman_path="$HOME/.sdkman/bin/sdkman-init.sh"
+	[[ -f $_sdkman_path ]] && . "$_sdkman_path"
+
+	if ! declare -f sdk >/dev/null; then
+		if [[ ! -f "$_sdkman_path" ]]; then
 			curl -s "https://get.sdkman.io" | bash
 		fi
-		source "$HOME/.sdkman/bin/sdman-init.sh"
+		source "$_sdkman_path"
 	fi
 }
 
@@ -18,26 +21,26 @@ name)
 install)
 	shift
 	ensure_sdkman
-	announce run "sdk install $*"
+	announce run "source $_sdkman_path && sdk install $*"
 	;;
 upgrade)
 	shift
 	ensure_sdkman
-	announce run "sdk update"
-	announce run "sdk upgrade $*"
-	announce run "sdk selfupdate"
+	announce run "source $_sdkman_path && sdk update"
+	announce run "source $_sdkman_path && sdk upgrade $*"
+	announce run "source $_sdkman_path && sdk selfupdate"
 	;;
 purge)
 	shift
-	announce run "sdk uninstall $*"
+	announce run "source $_sdkman_path && sdk uninstall $*"
 	;;
 remove)
 	shift
-	announce run "sdk uninstall $*"
+	announce run "source $_sdkman_path && sdk uninstall $*"
 	;;
 search)
 	shift
-	announce run "sdk list $*"
+	announce run "source $_sdkman_path && sdk list $*"
 	;;
 *)
 	announce "Invalid command '$1'."
