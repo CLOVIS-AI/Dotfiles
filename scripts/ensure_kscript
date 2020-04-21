@@ -1,4 +1,36 @@
 #!/usr/bin/env bash
 
-command -v kscript >/dev/null 2>&1 || curl -L "https://git.io/fpF1K" | bash 1>&2
+. announce-menu --import
+
+function _in_path() {
+	command -v "$1" >/dev/null 2>&1
+}
+
+function _install_sdkman() {
+	if _in_path sdk; then
+		echo "SDKMAN is already installed..."
+	else
+		echo "SDKMAN is not installed..."
+		_in_path curl || packager install curl
+		_in_path unzip || packager install unzip
+		curl -s "https://get.sdkman.io" | bash
+		source "$HOME/.sdkman/bin/sdman-init.sh"
+	fi
+
+	curl -L "https://git.io/fpF1K" | bash
+}
+
+if ! _in_path kscript; then
+	announce-menu --title "'kscript' is necessary to run this script." \
+		"packager:Install 'kscript' with Packager (recommended for distros which are up-to-date: Arch,...)" \
+		"sdkman:Install 'kscript' with SDKMAN (a non-root package manager, recommended for distros which are not up-to-date: Debian, Ubuntu...)" \
+		"stop:Do not run this script."
+
+	case $(announce-menu --get) in
+	packager) packager install kscript ;;
+	sdkman) _install_sdkman ;;
+	stop) exit 0 ;;
+	esac
+fi
+
 exec kscript "$@"
