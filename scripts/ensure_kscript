@@ -13,11 +13,11 @@ function _install_sdkman() {
 		echo "SDKMAN is not installed..."
 		_in_path curl || packager install curl
 		_in_path unzip || packager install unzip
-		curl -s "https://get.sdkman.io" | bash
+		curl -L "https://get.sdkman.io" | bash 1>&2
 		source "$HOME/.sdkman/bin/sdman-init.sh"
 	fi
 
-	curl -L "https://git.io/fpF1K" | bash
+	curl -L "https://git.io/fpF1K" | bash 1>&2
 }
 
 if ! _in_path kscript; then
