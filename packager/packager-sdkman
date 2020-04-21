@@ -1,0 +1,46 @@
+#!/bin/bash
+
+function ensure_sdkman() {
+	if ! command -v sdk; then
+		if [[ ! -f "$HOME/.sdkman/bin/sdkman-init.sh" ]]; then
+			curl -s "https://get.sdkman.io" | bash
+		fi
+		source "$HOME/.sdkman/bin/sdman-init.sh"
+	fi
+}
+
+case $1 in
+enabled) ;;
+
+name)
+	echo -en "Software Development Kit Manager"
+	;;
+install)
+	shift
+	ensure_sdkman
+	announce run "sdk install $*"
+	;;
+upgrade)
+	shift
+	ensure_sdkman
+	announce run "sdk update"
+	announce run "sdk upgrade $*"
+	announce run "sdk selfupdate"
+	;;
+purge)
+	shift
+	announce run "sdk uninstall $*"
+	;;
+remove)
+	shift
+	announce run "sdk uninstall $*"
+	;;
+search)
+	shift
+	announce run "sdk list $*"
+	;;
+*)
+	announce "Invalid command '$1'."
+	exit 2
+	;;
+esac
