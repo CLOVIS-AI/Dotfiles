@@ -231,3 +231,8 @@ if (commitRange == "incoming") {
 }
 
 //endregion
+
+//region Footer
+val projectUrl: String? = System.getenv("CI_PROJECT_URL")
+if (projectUrl != null) Printer.url("Project URL", projectUrl)
+//endregion
