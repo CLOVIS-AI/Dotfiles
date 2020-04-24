@@ -71,8 +71,13 @@ if (argument(argIndex) != "--no-title") {
 //endregion
 
 //region Commit range
-val commitRange = argument(argIndex) ?: ""
-Printer.text("Git options: '$commitRange'")
+var commitRange: String
+if (argument(argIndex) == "--incoming") {
+	commitRange = "incoming"
+} else {
+	commitRange = argument(argIndex) ?: ""
+	Printer.text("Git options: '$commitRange'")
+}
 //endregion
 
 //region Sorting
@@ -170,9 +175,35 @@ fun BufferedReader.collectAsString(): String {
 
 fun Stream<String>.getCommitInformation() = map { shell("git show --quiet --pretty=\"%h::::%an::::%cn::::%s\" $it").collectAsString() }
 
-fun Stream<Pair<Type, Commit>>.display() {
+fun Stream<Pair<Type, Commit>>.display(withHeader: Boolean) {
 	val data = collect(Collectors.toList())
 	val sorted = data.groupBy { it.first }.map { entry -> entry.key to entry.value.map { it.second } }
+
+	if (withHeader) {
+		println()
+		shell("git show -s --format=\"%s%n%n%b%n%nMerger: %cn\" | sed 's|See merge " + "request \\(.*\\)!\\(.*\\)\$|More information: https://gitlab.com/\\1/-/merge_requests/\\2|'").lines().forEach(::println)
+
+		println()
+		Printer.title("Included modifications")
+	}
+
+	println()
+	val authors = data.map { it.second.author }.toHashSet()
+	val committers = data.map { it.second.committer }.toHashSet()
+
+	if (authors.size == 1) {
+		val author = authors.find { true }
+		Printer.text("Author: $author")
+	} else {
+		Printer.text("Authors: ${authors.joinToString(", ")}")
+	}
+
+	if (committers.size == 1) {
+		val committer = committers.find { true }
+		Printer.text("Committer: $committer")
+	} else {
+		Printer.text("Committers: ${committers.joinToString(", ")}")
+	}
 
 	for ((type, commits) in sorted) {
 		println()
@@ -191,8 +222,12 @@ fun Stream<Pair<Type, Commit>>.display() {
 	}
 }
 
-fun Stream<String>.startPipeline() = this.parallel().getCommitInformation().asCommits().findType().display()
+fun Stream<String>.startPipeline(withHeader: Boolean) = this.parallel().getCommitInformation().asCommits().findType().display(withHeader)
 
-shell("git log --pretty=format:'%h' $commitRange").lines().startPipeline()
+if (commitRange == "incoming") {
+	shell("git blog --exclude-first | grep \"current\" | sed -e 's/current://;s/^\\(.\\{7\\}\\).*/\\1/'").lines().startPipeline(true)
+} else {
+	shell("git log --pretty=format:'%h' $commitRange").lines().startPipeline(false)
+}
 
 //endregion
