@@ -6,7 +6,7 @@ function _in_path() {
 	command -v "$1" >/dev/null 2>&1
 }
 
-function _install_sdkman() {
+if ! _in_path kscript; then
 	_sdkman_path="$HOME/.sdkman/bin/sdkman-init.sh"
 	[[ -f $_sdkman_path ]] && . "$_sdkman_path"
 
@@ -34,20 +34,9 @@ function _install_sdkman() {
 		source "$_sdkman_path"
 	fi
 
-	curl -L "https://git.io/fpF1K" | bash
-}
+	curl -L "https://git.io/fpF1K" | SDKMAN_DIR="$HOME/.sdkman" bash
 
-if ! _in_path kscript; then
-	announce-menu --title "'kscript' is necessary to run this script." \
-		"packager:Install 'kscript' with Packager (recommended for distros which are up-to-date; Arch,...)" \
-		"sdkman:Install 'kscript' with SDKMAN (a non-root package manager, recommended for distros which are not up-to-date; Debian, Ubuntu...)" \
-		"stop:Do not run this script."
-
-	case $(announce-menu-get) in
-	packager) packager install kscript ;;
-	sdkman) _install_sdkman ;;
-	stop) exit 0 ;;
-	esac
+	source "$_sdkman_path"
 fi
 
 exec kscript "$@"
