@@ -135,6 +135,11 @@ data class Commit(val id: String, val author: String, val committer: String, val
 
 fun Commit.withScope(): Commit {
 	val semicolon = subject.indexOf(':')
+	if (semicolon == -1 || subject.substring(0 until semicolon).contains(' ')) {
+		// if there is no semicolon, or if there is a space between the start
+		// and the semicolon, the user is not following the conventions.
+		return this
+	}
 
 	val title = subject.substring(semicolon + 2)
 
