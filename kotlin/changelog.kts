@@ -77,46 +77,46 @@ Printer.text("Git options: '$commitRange'")
 
 //region Sorting
 enum class Type(val prettyName: String) {
-	BUILD("Build"), CI("CI/CD"), DOC("Documentation"), FEAT("New features"), FIX("Fixes"), PERF("Performance improvements"), REFACTOR("Refactoring"), STYLE("Style modifications"), TEST("Tests"), BREAKING("Breaking changes"), MERGE("Merges"), UNKNOWN("Unsorted"),
+	BUILD("Build"), CI("CI/CD"), DOC("Documentation"), FEAT("New features"), FIX("Fixes"), PERF("Performance " + "improvements"), REFACTOR("Internal modifications"), STYLE("Style modifications"), TEST("Tests"), BREAKING("Breaking" + " changes"), MERGE("Merges"), UNKNOWN("Unsorted"), UPGRADE("Dependencies")
 }
 
 fun Commit.findType(): Pair<Type, Commit> = with(subject) {
 	when {
-		startsWith("feat(") -> FEAT to asAngular()
-		startsWith("feat") -> FEAT to asESLint()
+		startsWith("feat") -> FEAT to withScope()
+		startsWith("New") -> FEAT to withScope()
 
-		startsWith("build(") -> BUILD to asAngular()
-		startsWith("build") -> BUILD to asESLint()
+		startsWith("build") -> BUILD to withScope()
+		startsWith("Build") -> BUILD to withScope()
 
-		startsWith("ci(") -> CI to asAngular()
-		startsWith("ci") -> CI to asESLint()
+		startsWith("upgrade") -> UPGRADE to withScope()
+		startsWith("Upgrade") -> UPGRADE to withScope()
 
-		startsWith("fix(") -> FIX to asAngular()
-		startsWith("fixes(") -> FIX to asAngular()
-		startsWith("fix") -> FIX to asESLint()
+		startsWith("ci") -> CI to withScope()
 
-		startsWith("doc(") -> DOC to asAngular()
-		startsWith("docs(") -> DOC to asAngular()
-		startsWith("doc") -> DOC to asESLint()
+		startsWith("fix") -> FIX to withScope()
+		startsWith("fixes") -> FIX to withScope()
+		startsWith("Fix") -> FIX to withScope()
 
-		startsWith("perf(") -> PERF to asAngular()
-		startsWith("perfs(") -> PERF to asAngular()
-		startsWith("perf") -> PERF to asESLint()
+		startsWith("doc") -> DOC to withScope()
+		startsWith("docs") -> DOC to withScope()
+		startsWith("Docs") -> DOC to withScope()
 
-		startsWith("refactor(") -> REFACTOR to asAngular()
-		startsWith("refactor") -> REFACTOR to asESLint()
+		startsWith("perf") -> PERF to withScope()
+		startsWith("perfs") -> PERF to withScope()
 
-		startsWith("style(") -> STYLE to asAngular()
-		startsWith("style") -> STYLE to asESLint()
+		startsWith("refactor") -> REFACTOR to withScope()
+		startsWith("Update") -> REFACTOR to withScope()
 
-		startsWith("test(") -> TEST to asAngular()
-		startsWith("tests(") -> TEST to asAngular()
-		startsWith("test") -> TEST to asESLint()
+		startsWith("style") -> STYLE to withScope()
 
-		startsWith("breaking(") -> BREAKING to asAngular()
-		startsWith("breaking") -> BREAKING to asESLint()
+		startsWith("test") -> TEST to withScope()
+		startsWith("tests") -> TEST to withScope()
+
+		startsWith("breaking") -> BREAKING to withScope()
+		startsWith("Breaking") -> BREAKING to withScope()
 
 		startsWith("Merge branch ") -> MERGE to this@findType
+		startsWith("merge") -> MERGE to withScope()
 
 		else -> UNKNOWN to this@findType
 	}
@@ -128,11 +128,22 @@ fun Stream<Commit>.findType() = map { it.findType() }
 //region Commit data
 data class Commit(val id: String, val author: String, val committer: String, val subject: String, val scope: String? = null)
 
-//LANGUAGE=RegEx
-val angularRegex = "(.*): ".toRegex()
-fun Commit.asAngular(): Commit = copy(subject = angularRegex.replaceFirst(subject, ""), scope = subject.substring(subject.indexOf('(') + 1, subject.indexOf(')')))
+fun Commit.withScope(): Commit {
+	val semicolon = subject.indexOf(':')
 
-fun Commit.asESLint(): Commit = copy(subject = subject.substring(subject.indexOf(':') + 2))
+	val title = subject.substring(semicolon + 2)
+
+	val openParenthesis = subject.indexOf('(')
+	val closeParenthesis = subject.indexOf(')', openParenthesis + 1)
+
+	return if (openParenthesis != -1 && closeParenthesis != -1 && closeParenthesis - openParenthesis != 1 && closeParenthesis < semicolon) {
+		val scope = subject.substring(openParenthesis + 1, closeParenthesis)
+
+		copy(subject = title, scope = scope)
+	} else {
+		copy(subject = title)
+	}
+}
 
 fun asCommit(commit: String): Commit {
 	val (id, author, committer, subject) = commit.split("::::")
