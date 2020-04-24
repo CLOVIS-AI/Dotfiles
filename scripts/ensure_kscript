@@ -6,10 +6,10 @@ function _in_path() {
 	command -v "$1" >/dev/null 2>&1
 }
 
-if ! _in_path kscript; then
-	_sdkman_path="$HOME/.sdkman/bin/sdkman-init.sh"
-	[[ -f $_sdkman_path ]] && . "$_sdkman_path"
+_sdkman_path="$HOME/.sdkman/bin/sdkman-init.sh"
+[[ -f $_sdkman_path ]] && . "$_sdkman_path"
 
+if ! _in_path kscript; then
 	if declare -f sdk >/dev/null; then
 		echo "SDKMAN is already installed..."
 	else
