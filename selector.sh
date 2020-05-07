@@ -25,8 +25,8 @@ Options:
     --no-completion         Do not add bash completion
     --no-autofetch          Do not auto-fetch git repositories
     --no-autofetch-config   Do not auto-fetch the configuration repository
-    --login-shell			Specify session-wide values (PATH...)
-    --after-login			Specify everything that is NOT specified in --login-shell
+    --env-shell				Specify session-wide values (PATH...)
+    --no-env				Specify everything that is NOT specified in --env-shell
 
 Environment variables:
     CLOVIS_CONFIG_ALIASES   Source the Bash aliases (default: yes)
@@ -80,7 +80,7 @@ while [[ $# -gt 0 ]]; do
 	--no-autofetch-config)
 		CLOVIS_CONFIG_AFCONFIG=no
 		;;
-	--login-shell)
+	--env-shell)
 		CLOVIS_CONFIG_ALIASES=no
 		CLOVIS_CONFIG_PROMPT=no
 		CLOVIS_CONFIG_SCRIPTS=yes
@@ -90,7 +90,7 @@ while [[ $# -gt 0 ]]; do
 		CLOVIS_CONFIG_AFCONFIG=no
 		CLOVIS_CONFIG_COMPLETE=no
 		;;
-	--after-login)
+	--no-env)
 		CLOVIS_CONFIG_ALIASES=yes
 		CLOVIS_CONFIG_PROMPT=yes
 		CLOVIS_CONFIG_SCRIPTS=no

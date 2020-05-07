@@ -34,14 +34,14 @@ If you will only use the project the 'easy way' (not via SSH, and without callin
 If you intend to use these tools via SSH or other systems, you will need to differentiate between login shells and regular shells:
 
     # Bash: in ~/.bash_profile
-    . ~/config/selector.sh --login-shell
+    . ~/config/selector.sh --env-shell
     # Bash: in ~/.bashrc
-    . ~/config/selector.sh --after-login
+    . ~/config/selector.sh --no-env
     
-    # Zsh: in ~/.zlogin
-    . ~/config/selector.zsh --login-shell
+    # Zsh: in ~/.zshenv
+    . ~/config/selector.zsh --env-shell
     # Zsh: in ~/.zshrc
-    . ~/config/selector.zsh --after-login
+    . ~/config/selector.zsh --no-env
 
 ### Git
 
