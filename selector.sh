@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-if [[ $1 = "--help" || $1 == "help" ]]
-then
-    cat <<EOF
+if [[ $1 == "--help" || $1 == "help" ]]; then
+	cat <<EOF
 Selector.sh · CLOVIS-AI
 
 Description:
@@ -16,6 +15,7 @@ Usages:
     . selector.sh [options]
 
 Options:
+	Any option overrides previous options.
     -v, --verbose           Display information about what the script does
     --no-bash-aliases       Do not source the bash aliases
     --no-bash-prompt        Do not source the bash prompt
@@ -25,6 +25,8 @@ Options:
     --no-completion         Do not add bash completion
     --no-autofetch          Do not auto-fetch git repositories
     --no-autofetch-config   Do not auto-fetch the configuration repository
+    --login-shell			Specify session-wide values (PATH...)
+    --after-login			Specify everything that is NOT specified in --login-shell
 
 Environment variables:
     CLOVIS_CONFIG_ALIASES   Source the Bash aliases (default: yes)
@@ -40,48 +42,66 @@ fi
 
 CLOVIS_CONFIG_VERBOSE=0
 
-function debug {
-    if [[ $CLOVIS_CONFIG_VERBOSE == 1 ]]
-    then
-        echo -e "$*"
-    fi
+function debug() {
+	if [[ $CLOVIS_CONFIG_VERBOSE == 1 ]]; then
+		echo -e "$*"
+	fi
 }
 
 ################# Parse Arguments ##################
 
-while [[ $# -gt 0 ]]
-do
-    debug "Argument: $1"
-    case $1 in
-    -v|--verbose)
-        CLOVIS_CONFIG_VERBOSE=1
-        ;;
-    --no-bash-aliases)
-        CLOVIS_CONFIG_ALIASES=no
-        ;;
-    --no-bash-prompt)
-        CLOVIS_CONFIG_PROMPT=no
-        ;;
-    --no-scripts)
-        CLOVIS_CONFIG_SCRIPTS=no
-        ;;
-    --no-packager)
-    	CLOVIS_CONFIG_PACKAGER=no
-    	;;
- 	--no-probe)
- 		CLOVIS_CONFIG_PROBE=no
- 		;;
-    --no-completion)
-        CLOVIS_CONFIG_COMPLETE=no
-        ;;
-    --no-autofetch)
-        CLOVIS_CONFIG_AUTOFETCH=no
-        ;;
-    --no-autofetch-config)
-        CLOVIS_CONFIG_AFCONFIG=no
-        ;;
-    esac
-    shift
+while [[ $# -gt 0 ]]; do
+	debug "Argument: $1"
+	case $1 in
+	-v | --verbose)
+		CLOVIS_CONFIG_VERBOSE=1
+		;;
+	--no-bash-aliases)
+		CLOVIS_CONFIG_ALIASES=no
+		;;
+	--no-bash-prompt)
+		CLOVIS_CONFIG_PROMPT=no
+		;;
+	--no-scripts)
+		CLOVIS_CONFIG_SCRIPTS=no
+		;;
+	--no-packager)
+		CLOVIS_CONFIG_PACKAGER=no
+		;;
+	--no-probe)
+		CLOVIS_CONFIG_PROBE=no
+		;;
+	--no-completion)
+		CLOVIS_CONFIG_COMPLETE=no
+		;;
+	--no-autofetch)
+		CLOVIS_CONFIG_AUTOFETCH=no
+		;;
+	--no-autofetch-config)
+		CLOVIS_CONFIG_AFCONFIG=no
+		;;
+	--login-shell)
+		CLOVIS_CONFIG_ALIASES=no
+		CLOVIS_CONFIG_PROMPT=no
+		CLOVIS_CONFIG_SCRIPTS=yes
+		CLOVIS_CONFIG_PACKAGER=yes
+		CLOVIS_CONFIG_PROBE=yes
+		CLOVIS_CONFIG_AUTOFETCH=no
+		CLOVIS_CONFIG_AFCONFIG=no
+		CLOVIS_CONFIG_COMPLETE=no
+		;;
+	--after-login)
+		CLOVIS_CONFIG_ALIASES=yes
+		CLOVIS_CONFIG_PROMPT=yes
+		CLOVIS_CONFIG_SCRIPTS=no
+		CLOVIS_CONFIG_PACKAGER=no
+		CLOVIS_CONFIG_PROBE=no
+		CLOVIS_CONFIG_AUTOFETCH=yes
+		CLOVIS_CONFIG_AFCONFIG=yes
+		CLOVIS_CONFIG_COMPLETE=yes
+		;;
+	esac
+	shift
 done
 
 ################# Finding the config ###############
@@ -91,73 +111,64 @@ debug "The configuration should be in: $CLOVIS_CONFIG"
 
 ################# Source scripts ###################
 
-if [[ ${CLOVIS_CONFIG_ALIASES:-yes} == yes ]]
-then
-    debug "Sourcing the Bash aliases..."
+if [[ ${CLOVIS_CONFIG_ALIASES:-yes} == yes ]]; then
+	debug "Sourcing the Bash aliases..."
 
-    # shellcheck source=bash-aliases
-    . "$CLOVIS_CONFIG"/bash-aliases
+	# shellcheck source=bash-aliases
+	. "$CLOVIS_CONFIG"/bash-aliases
 fi
 
-if [[ ${CLOVIS_CONFIG_PROMPT:-yes} == yes ]]
-then
-    debug "Sourcing the Bash prompt..."
+if [[ ${CLOVIS_CONFIG_PROMPT:-yes} == yes ]]; then
+	debug "Sourcing the Bash prompt..."
 
-    # shellcheck source=bash-prompt.sh
-    . "$CLOVIS_CONFIG"/bash-prompt.sh
+	# shellcheck source=bash-prompt.sh
+	. "$CLOVIS_CONFIG"/bash-prompt.sh
 fi
 
-if [[ ${CLOVIS_CONFIG_SCRIPTS:-yes} == yes ]]
-then
-    debug "Adding the scripts to the PATH variable..."
+if [[ ${CLOVIS_CONFIG_SCRIPTS:-yes} == yes ]]; then
+	debug "Adding the scripts to the PATH variable..."
 
-    PATH="$PATH:$CLOVIS_CONFIG/scripts"
+	PATH="$PATH:$CLOVIS_CONFIG/scripts"
 fi
 
-if [[ ${CLOVIS_CONFIG_PACKAGER:-yes} == yes ]]
-then
+if [[ ${CLOVIS_CONFIG_PACKAGER:-yes} == yes ]]; then
 	debug "Adding the packager system to the PATH variable..."
 
 	PATH="$PATH:$CLOVIS_CONFIG/packager"
 fi
 
-if [[ ${CLOVIS_CONFIG_PROBE:-yes} == yes ]]
-then
+if [[ ${CLOVIS_CONFIG_PROBE:-yes} == yes ]]; then
 	debug "Adding the probe system to the PATH variable..."
 
 	PATH="$PATH:$CLOVIS_CONFIG/probe"
 fi
 
-if [[ ${CLOVIS_CONFIG_COMPLETE:-yes} == yes ]]
-then
-    debug "Sourcing bash completion for the different commands..."
+if [[ ${CLOVIS_CONFIG_COMPLETE:-yes} == yes ]]; then
+	debug "Sourcing bash completion for the different commands..."
 
-    # shellcheck source=packager/packager
-    . "$CLOVIS_CONFIG"/packager/packager complete
+	# shellcheck source=packager/packager
+	. "$CLOVIS_CONFIG"/packager/packager complete
 
-    # shellcheck source=scripts/announce
-    . "$CLOVIS_CONFIG"/scripts/announce complete
+	# shellcheck source=scripts/announce
+	. "$CLOVIS_CONFIG"/scripts/announce complete
 fi
 
-if [[ ${CLOVIS_CONFIG_AUTOFETCH:-yes} == yes ]]
-then
-    debug "Setting up git autofetch..."
-    
-    export PROMPT_COMMAND
-    if [[ "$PROMPT_COMMAND" == "" ]]
-    then
-        PROMPT_COMMAND="git autofetch"
-    else
-        PROMPT_COMMAND="$PROMPT_COMMAND; git autofetch"
-    fi
+if [[ ${CLOVIS_CONFIG_AUTOFETCH:-yes} == yes ]]; then
+	debug "Setting up git autofetch..."
+
+	export PROMPT_COMMAND
+	if [[ "$PROMPT_COMMAND" == "" ]]; then
+		PROMPT_COMMAND="git autofetch"
+	else
+		PROMPT_COMMAND="$PROMPT_COMMAND; git autofetch"
+	fi
 fi
 
-if [[ ${CLOVIS_CONFIG_AFCONFIG:-yes} == yes ]]
-then
-    debug "Autofetching the configuration repository..."
-    
-    here=$(pwd)
-    cd "$CLOVIS_CONFIG"
-    git autofetch
-    cd "$here"
+if [[ ${CLOVIS_CONFIG_AFCONFIG:-yes} == yes ]]; then
+	debug "Autofetching the configuration repository..."
+
+	here=$(pwd)
+	cd "$CLOVIS_CONFIG"
+	git autofetch
+	cd "$here"
 fi
