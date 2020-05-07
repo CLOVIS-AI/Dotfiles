@@ -1,38 +1,51 @@
 # dotfiles
 
-Config files for my computers
+Config files for my computers.
+This repository also contains various aliases and scripts to automate many tasks.
+
+You can find a non-exhaustive list of added commands for Git [here](git-aliases.md).
 
 ## Installation
 
-Clone the repository in `~/config`:
+By default, this repository expects to be cloned in `~/config`.
 
-    git clone git@gitlab.com:clovis-ai/dotgiles.git ~/config
+    git clone git@gitlab.com:clovis-ai/dotfiles.git ~/config
 
-### .bashrc
+If you want to clone it elsewhere, you can set the following environment variable (if you decide to do so, do replace the path in all other examples in this file as well):
 
-To activate the configuration, add this line to your `.bashrc` or similar file:
+    export CLOVIS_CONFIG="the path where you cloned it"
 
-    . ~/config/selector.sh
+### Bash and Zsh
 
-It is possible to select which features are activated or not by default. To know what you can do, type:
+The configuration is done via the `selector` script, either `selector.sh` for Bash, or `selector.zsh` for Zsh.
+
+This guide assumes you want to activate *everything* this project brings. If you don't (eg. you don't want the prompts), run the following commands to see what the options are:
 
     . ~/config/selector.sh --help
 
-### Git config
+If you will only use the project the 'easy way' (not via SSH, and without calling programs from outside the shell), you can init it like this:
 
-Add the following lines to your `.gitconfig`.
+    # If you use Bash, in ~/.bashrc
+    . ~/config/selector.sh
+
+    # If you use Zsh, in ~/.zshrc
+    . ~/config/selector.zsh
+
+If you intend to use these tools via SSH or other systems, you will need to differentiate between login shells and regular shells:
+
+    # Bash: in ~/.bash_profile
+    . ~/config/selector.sh --login-shell
+    # Bash: in ~/.bashrc
+    . ~/config/selector.sh --after-login
+    
+    # Zsh: in ~/.zlogin
+    . ~/config/selector.zsh --login-shell
+    # Zsh: in ~/.zshrc
+    . ~/config/selector.zsh --after-login
+
+### Git
+
+To get access to the Git configuration (including aliases and default merge strategies), add the following lines to your `~/.gitconfig`:
 
     [include]
         path = ~/config/gitconfig
-
-### Using a different path than the default one
-
-You can add the following environnement variable:
-
-    export CLOVIS_CONFIG="the path you want to clone the repository to"
-
-As much as possible of this config will honor this environnement variable, but, for example, the Git configuration doesn't (no support for environnement variables in configuration files). At the moment, the only thing you will be missing out is the user-wide Gitignore file. If you need it, either include it in your global `.gitconfig` file, or create a symlink from `~/config/gitignore` to the desired location.
-
-## Usage
-
-A cheatsheet of Git commands can be found [here](git-aliases.md).
