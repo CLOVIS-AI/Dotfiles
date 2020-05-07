@@ -75,7 +75,7 @@ var commitRange: String
 if (argument(argIndex) == "--incoming") {
 	commitRange = "incoming"
 } else {
-	commitRange = argument(argIndex) ?: ""
+	commitRange = args.copyOfRange(argIndex, args.size).joinToString(" ")
 	Printer.text("Git options: '$commitRange'")
 }
 //endregion
