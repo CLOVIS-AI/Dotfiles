@@ -2,6 +2,8 @@
 
 . announce-menu --import
 
+echo -en "Checking dependencies...\r"
+
 function _in_path() {
 	command -v "$1" >/dev/null 2>&1
 }
@@ -68,4 +70,5 @@ if ! _in_path kscript; then
 	esac
 fi
 
+echo -en "Working...                 \r"
 exec kscript "$@"
