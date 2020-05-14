@@ -39,22 +39,22 @@ function _install_sdkman_kscript() {
 
 	if ! _in_path java; then
 		echo -en "[-->   ] Installing java...          \r"
-		sdk install java >/dev/null
+		sdk install java >/dev/null 2>/dev/null
 	fi
 
 	if ! _in_path kotlin; then
 		echo -en "[--->  ] Installing kotlin...          \r"
-		sdk install kotlin >/dev/null
+		sdk install kotlin >/dev/null 2>/dev/null
 	fi
 
 	if ! _in_path gradle; then
 		echo -en "[----> ] Installing gradle...          \r"
-		sdk install gradle >/dev/null
+		sdk install gradle >/dev/null 2>/dev/null
 	fi
 
 	if ! _in_path kscript; then
 		echo -en "[----->] Installing kscript...          \r"
-		sdk install kscript >/dev/null
+		sdk install kscript >/dev/null 2>/dev/null
 	fi
 
 	source "$_sdkman_path"
