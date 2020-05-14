@@ -18,7 +18,7 @@ function _install_sdkman_kscript() {
 		echo -en "[>      ] Checking dependencies...    \r"
 
 		if ! _in_path curl; then
-			echo "'curl' is not installed..."
+			echo "'curl' is not installed...            "
 			packager install curl || exit 1
 		fi
 
@@ -33,28 +33,28 @@ function _install_sdkman_kscript() {
 		fi
 
 		echo "[->     ] Installing SDKMAN..."
-		curl -L "https://get.sdkman.io" | bash >/dev/null
+		curl -L "https://get.sdkman.io" | bash >/dev/null 2>/dev/null
 		source "$_sdkman_path"
 	fi
 
 	if ! _in_path java; then
 		echo -en "[-->   ] Installing java...          \r"
-		sdk install java
+		sdk install java >/dev/null
 	fi
 
 	if ! _in_path kotlin; then
 		echo -en "[--->  ] Installing kotlin...          \r"
-		sdk install kotlin
+		sdk install kotlin >/dev/null
 	fi
 
 	if ! _in_path gradle; then
 		echo -en "[----> ] Installing gradle...          \r"
-		sdk install gradle
+		sdk install gradle >/dev/null
 	fi
 
 	if ! _in_path kscript; then
 		echo -en "[----->] Installing kscript...          \r"
-		sdk install kscript
+		sdk install kscript >/dev/null
 	fi
 
 	source "$_sdkman_path"
