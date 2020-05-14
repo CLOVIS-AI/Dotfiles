@@ -128,19 +128,25 @@ fi
 if [[ ${CLOVIS_CONFIG_SCRIPTS:-yes} == yes ]]; then
 	debug "Adding the scripts to the PATH variable..."
 
-	PATH="$PATH:$CLOVIS_CONFIG/scripts"
+	if [[ $PATH != *"$CLOVIS_CONFIG/scripts"* ]]; then
+		PATH="$PATH:$CLOVIS_CONFIG/scripts"
+	fi
 fi
 
 if [[ ${CLOVIS_CONFIG_PACKAGER:-yes} == yes ]]; then
 	debug "Adding the packager system to the PATH variable..."
 
-	PATH="$PATH:$CLOVIS_CONFIG/packager"
+	if [[ $PATH != *"$CLOVIS_CONFIG/packager"* ]]; then
+		PATH="$PATH:$CLOVIS_CONFIG/packager"
+	fi
 fi
 
 if [[ ${CLOVIS_CONFIG_PROBE:-yes} == yes ]]; then
 	debug "Adding the probe system to the PATH variable..."
 
-	PATH="$PATH:$CLOVIS_CONFIG/probe"
+	if [[ $PATH != *"$CLOVIS_CONFIG/probe"* ]]; then
+		PATH="$PATH:$CLOVIS_CONFIG/probe"
+	fi
 fi
 
 if [[ ${CLOVIS_CONFIG_COMPLETE:-yes} == yes ]]; then
