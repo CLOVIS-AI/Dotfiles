@@ -13,9 +13,10 @@ _sdkman_path="$HOME/.sdkman/bin/sdkman-init.sh"
 
 function _install_sdkman_kscript() {
 	if declare -f sdk >/dev/null; then
-		echo "SDKMAN is already installed..."
+		echo -en "[->     ] SDKMAN is installed...      \r"
 	else
-		echo "SDKMAN is not installed..."
+		echo -en "[>      ] Checking dependencies...    \r"
+
 		if ! _in_path curl; then
 			echo "'curl' is not installed..."
 			packager install curl || exit 1
@@ -31,11 +32,30 @@ function _install_sdkman_kscript() {
 			packager install unzip || exit 1
 		fi
 
-		curl -L "https://get.sdkman.io" | bash
+		echo "[->     ] Installing SDKMAN..."
+		curl -L "https://get.sdkman.io" | bash >/dev/null
 		source "$_sdkman_path"
 	fi
 
-	curl -L "https://git.io/fpF1K" | SDKMAN_DIR="$HOME/.sdkman" bash
+	if ! _in_path java; then
+		echo -en "[-->   ] Installing java...          \r"
+		sdk install java
+	fi
+
+	if ! _in_path kotlin; then
+		echo -en "[--->  ] Installing kotlin...          \r"
+		sdk install kotlin
+	fi
+
+	if ! _in_path gradle; then
+		echo -en "[----> ] Installing gradle...          \r"
+		sdk install gradle
+	fi
+
+	if ! _in_path kscript; then
+		echo -en "[----->] Installing kscript...          \r"
+		sdk install kscript
+	fi
 
 	source "$_sdkman_path"
 }
@@ -43,32 +63,22 @@ function _install_sdkman_kscript() {
 if ! _in_path kscript; then
 	echo "This script needs 'kscript', which is missing from your system."
 
-	echo "If you are a human, type 'ENTER' now. Otherwise, automatic installation will start in 10 seconds..."
-	read -t 10 -r _user_choice || _user_choice="no-user-here"
+	echo "Type '0' to install SDKMAN and kscript automatically."
+	echo "Type '1' to install kscript using packager."
+	echo "Type anything else to quit."
+	read -t 10 -r _user_choice || _user_choice="0"
 	case "$_user_choice" in
-	no-user-here)
-		echo "This shell is not interactive. Installing 'SDKMAN' and 'kscript'..."
+	0)
 		_install_sdkman_kscript
 		;;
+	1)
+		packager install kscript
+		;;
 	*)
-		announce-menu --title "Necessary dependency 'kscript' is missing. What do you want to do?" \
-			"packager:Install 'kscript' with Packager (requires root & the existence of a kscript package)" \
-			"sdkman:Install SDKMAN and 'kscript' (does not require root)" \
-			"stop:Give up and quit"
-		case $(announce-menu-get) in
-		packager)
-			packager install kscript
-			;;
-		sdkman)
-			_install_sdkman_kscript
-			;;
-		*)
-			exit 167
-			;;
-		esac
+		exit 0
 		;;
 	esac
 fi
 
-echo -en "Working...                 \r"
+echo -en "Working...                                                          \r"
 exec kscript "$@"
