@@ -2,7 +2,7 @@
 
 . announce-menu --import
 
-echo -en "Checking dependencies...\r"
+echo -en "Checking dependencies...\r" >&2
 
 function _in_path() {
 	command -v "$1" >/dev/null 2>&1
