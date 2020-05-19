@@ -13,9 +13,9 @@ _sdkman_path="$HOME/.sdkman/bin/sdkman-init.sh"
 
 function _install_sdkman_kscript() {
 	if declare -f sdk >/dev/null; then
-		echo -en "[->     ] SDKMAN is installed...      \r"
+		echo -en "[->     ] SDKMAN is installed...      \r" >&2
 	else
-		echo -en "[>      ] Checking dependencies...    \r"
+		echo -en "[>      ] Checking dependencies...    \r" >&2
 
 		if ! _in_path curl; then
 			echo "'curl' is not installed...            "
@@ -32,28 +32,28 @@ function _install_sdkman_kscript() {
 			packager install unzip || exit 1
 		fi
 
-		echo "[->     ] Installing SDKMAN..."
+		echo "[->     ] Installing SDKMAN..." >&2
 		curl -L "https://get.sdkman.io" | bash >/dev/null 2>/dev/null
 		source "$_sdkman_path"
 	fi
 
 	if ! _in_path java; then
-		echo -en "[-->   ] Installing java...          \r"
+		echo -en "[-->   ] Installing java...          \r" >&2
 		sdk install java >/dev/null 2>/dev/null
 	fi
 
 	if ! _in_path kotlin; then
-		echo -en "[--->  ] Installing kotlin...          \r"
+		echo -en "[--->  ] Installing kotlin...          \r" >&2
 		sdk install kotlin >/dev/null 2>/dev/null
 	fi
 
 	if ! _in_path gradle; then
-		echo -en "[----> ] Installing gradle...          \r"
+		echo -en "[----> ] Installing gradle...          \r" >&2
 		sdk install gradle >/dev/null 2>/dev/null
 	fi
 
 	if ! _in_path kscript; then
-		echo -en "[----->] Installing kscript...          \r"
+		echo -en "[----->] Installing kscript...          \r" >&2
 		sdk install kscript >/dev/null 2>/dev/null
 	fi
 
@@ -61,24 +61,27 @@ function _install_sdkman_kscript() {
 }
 
 if ! _in_path kscript; then
-	echo "This script needs 'kscript', which is missing from your system."
-
-	echo "Type '0' to install SDKMAN and kscript automatically."
-	echo "Type '1' to install kscript using packager."
-	echo "Type anything else to quit."
-	read -t 10 -r _user_choice || _user_choice="0"
-	case "$_user_choice" in
-	0)
+	if [[ -t 0 ]]; then # stdin is a terminal, the user can input data
+		echo "This script needs 'kscript', which is missing from your system."
+		echo "Type '0' to install SDKMAN and kscript automatically."
+		echo "Type '1' to install kscript using packager."
+		echo "Type anything else to quit."
+		read -t 10 -r _user_choice || _user_choice="0"
+		case "$_user_choice" in
+		0)
+			_install_sdkman_kscript
+			;;
+		1)
+			packager install kscript
+			;;
+		*)
+			exit 0
+			;;
+		esac
+	else
 		_install_sdkman_kscript
-		;;
-	1)
-		packager install kscript
-		;;
-	*)
-		exit 0
-		;;
-	esac
+	fi
 fi
 
-echo -en "Working...                                                          \r"
+echo -en "Working...                                                          \r" >&2
 exec kscript "$@"
