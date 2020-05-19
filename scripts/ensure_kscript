@@ -62,12 +62,11 @@ function _install_sdkman_kscript() {
 
 if ! _in_path kscript; then
 	if [[ -t 0 ]]; then # stdin is a terminal, the user can input data
-		echo "This script needs 'kscript', which is missing from your system."
-		echo "Type '0' to install SDKMAN and kscript automatically."
-		echo "Type '1' to install kscript using packager."
-		echo "Type anything else to quit."
-		read -t 10 -r _user_choice || _user_choice="0"
-		case "$_user_choice" in
+		announce-menu --title "This script uses 'kscript', which is missing from your system." \
+			"sdkman:Install kscript with SDKMAN, a non-root packager manager" \
+			"packager:Use BrainDot's Packager tool to install kscript with your favorite package manager" \
+			"quit:Stop and exit without doing anything"
+		case "$(announce-menu-get)" in
 		0)
 			_install_sdkman_kscript
 			;;
