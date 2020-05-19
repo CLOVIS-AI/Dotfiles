@@ -67,13 +67,13 @@ if ! _in_path kscript; then
 			"packager:Use BrainDot's Packager tool to install kscript with your favorite package manager" \
 			"quit:Stop and exit without doing anything"
 		case "$(announce-menu-get)" in
-		0)
+		sdkman)
 			_install_sdkman_kscript
 			;;
-		1)
+		packager)
 			packager install kscript
 			;;
-		*)
+		quit)
 			exit 0
 			;;
 		esac
