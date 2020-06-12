@@ -1,10 +1,11 @@
 #!/bin/bash
 
-git data --check-repo 2>/dev/null || exit 0
+git-data --check-repo 2>/dev/null || exit 0
 
 [[ $1 == "--changelog" ]] && changelog_this_time=true
 
-fetch_head=$(git data --git-dir)/FETCH_HEAD
+git_dir=$(git-data --git-dir)
+fetch_head=$git_dir/FETCH_HEAD
 [[ ! -f "$fetch_head" ]] && should_fetch=true
 
 if [[ $should_fetch != true ]]; then
@@ -19,7 +20,7 @@ function fetch() {
 	git fetch --prune "$remote"
 }
 
-forcefetch="$(git data --git-dir)/.cl-forcefetch-"
+forcefetch="$git_dir/.cl-forcefetch-"
 for remote in $(git remote); do
 	if [[ -f "${forcefetch}$remote" ]]; then
 		announce "Last automatic fetch on $remote failed, let's try again."
@@ -29,7 +30,7 @@ for remote in $(git remote); do
 	fi
 done
 
-changelog_next_time="$(git data --git-dir)/.cl-changelog-next-time"
+changelog_next_time="$git_dir/.cl-changelog-next-time"
 [[ -f $changelog_next_time ]] && changelog_this_time=true
 if [[ $should_fetch == true ]]; then
 	echo "Automatically fetching remotes..."
@@ -40,12 +41,12 @@ if [[ $should_fetch == true ]]; then
 fi
 
 if [[ $changelog_this_time == "true" ]]; then
-	tracked=$(git data --tracked)
+	tracked=$(git-data --tracked)
 	[[ $tracked == "" ]] && exit 0
-	git data --remote-branch-exists "$tracked" || exit 0
+	git-data --remote-branch-exists "$tracked" || exit 0
 	COMMITS=$(git log .."$tracked")
 	if [[ "$COMMITS" != "" ]]; then
-		git changelog .."$tracked"
+		git-changelog .."$tracked"
 		rm -f "$changelog_next_time"
 	fi
 fi
