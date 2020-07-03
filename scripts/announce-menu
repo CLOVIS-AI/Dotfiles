@@ -5,9 +5,10 @@
 # Written by Ivan Canet
 #
 # Usage:
-#	announce-menu [--title TITLE] [--question QUESTION] [--default DEFAULT] <replies...>
+#	announce-menu [-d DELIMITER] [--title TITLE] [--question QUESTION] [--default DEFAULT] <replies...>
 #
 # Options:
+#	-d DELIMITER			Set what the character to use for columns is. Default: ':'
 #	--title	TITLE			Add a title line which says TITLE.
 #	--question QUESTION		Override the "Your choice:" question with QUESTION.
 #	--default DEFAULT		Set DEFAULT to be the default value.
@@ -36,6 +37,14 @@ function announce-menu-get() {
 [[ $1 == "--import" ]] && return
 
 [[ $1 == "--chosen" ]] && exec test "$(cat "$ANNOUNCE_MENU_PATH")" == "$2"
+
+if [[ $1 == "-d" ]]; then
+	delimiter="$2"
+	shift
+	shift
+else
+	delimiter=":"
+fi
 
 if [[ $1 == "--title" ]]; then
 	announce "$2"
@@ -84,7 +93,7 @@ ANSWERS=""
 
 function clean-word() {
 	# shellcheck disable=SC2001
-	WORD=$(sed <<<"$1" 's|:.*||')
+	WORD=$(sed <<<"$1" "s|$delimiter.*||")
 }
 
 i=0
@@ -97,7 +106,7 @@ function display-int() {
 		ANSWERS+="\e[0m"
 	fi
 
-	ANSWERS+="$i.:$1\e[0m\n"
+	ANSWERS+="$i.$delimiter$1\e[0m\n"
 	CHOICES[$i]="$WORD"
 	CHOICES[$WORD]="$WORD"
 	i=$((i + 1))
@@ -106,7 +115,7 @@ function display-int() {
 for input in "$@"; do
 	display-int "$input"
 done
-echo -e "$ANSWERS" | column -t -s ':' | less -rFX
+echo -e "$ANSWERS" | column -t -s "$delimiter" | less -rFX
 [[ $ALLOW_OTHER == "yes" ]] && echo "You can type your own comment."
 
 # ******************************* QUESTION *************************************
