@@ -1,0 +1,36 @@
+#!/bin/bash
+
+. announce-menu --import
+
+# ===================== IP SCAN ==========================================
+
+function ip_scan() {
+	interfaces=$(ip link show | grep -v '    ' | cut -f 2 -d ' ' | cut -f 1 -d ':')
+
+	# shellcheck disable=SC2086
+	announce-menu --title "Which interface do you want to scan?" \
+		$interfaces
+	interface=$(announce-menu-get)
+
+	addresses=$(ip address list "$interface" | grep inet | tr -s ' ' | cut -f 3 -d ' ')
+
+	# shellcheck disable=SC2086
+	announce-menu -d ' ' --title "Which address do you want to use?" \
+		$addresses
+	address=$(announce-menu-get)
+
+	echo -en "   Scanning...\r"
+	nmap_options=""
+	<<<"$address" grep ":" >/dev/null && nmap_options="-6"
+	nmap -sn $nmap_options "$address" | grep "Nmap scan report" | cut -f 5-6 -d ' ' | column -t
+}
+
+# ==================== MAIN MENU =========================================
+
+announce-menu --title "Welcome to Probe. What do you want to do?" \
+	"scan-ip:Scan local network"
+case $(announce-menu-get) in
+scan-ip)
+	ip_scan
+	;;
+esac
