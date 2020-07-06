@@ -5,6 +5,8 @@
 # ===================== IP SCAN ==========================================
 
 function ip_scan() {
+	. cl-depend ip "probe/scan_ip"
+	. cl-depend nmap "probe/scan_ip"
 	interfaces=$(ip link show | grep -v '    ' | cut -f 2 -d ' ' | cut -f 1 -d ':')
 
 	# shellcheck disable=SC2086
@@ -22,7 +24,7 @@ function ip_scan() {
 	echo -en "   Scanning...\r"
 	nmap_options=""
 	<<<"$address" grep ":" >/dev/null && nmap_options="-6"
-	nmap -sn $nmap_options "$address" | grep "Nmap scan report" | cut -f 5-6 -d ' ' | column -t
+	nmap -sn $nmap_options "$address" 2>/dev/null | grep "Nmap scan report" | cut -f 5-6 -d ' ' | column -t
 }
 
 # ==================== MAIN MENU =========================================
