@@ -20,6 +20,18 @@
 #						the error/warning message.
 #
 
+function install-if-possible {
+	if hash packager 2>/dev/null; then
+		. announce-menu --import
+		announce-menu --title "Do you want to install $*?" \
+			"yes:Use Packager to install $*" \
+			"no:Quit"
+		if [[ $(announce-menu-get) == "yes" ]]; then
+			announce run "packager install $*" && QUIT=""
+		fi
+	fi
+}
+
 function cl-error {
 	if [[ $1 == "--exit" ]]; then
 		QUIT=$2
@@ -27,14 +39,18 @@ function cl-error {
 	fi
 
 	echo -en "\e[1;31m$1 ERROR:\e[21m"; shift
-	echo -e " $*\e[39m"
+	echo -e " Missing dependency $*\e[39m"
+
+	install-if-possible "$*"
 
 	[[ ${QUIT} != "" ]] && exit "$QUIT"
 }
 
 function cl-warning {
-	echo -en "\e[1;33m$1 ERROR:\e[21m"; shift
-	echo -e " $*\e[39m"
+	echo -en "\e[1;33m$1 WARN:\e[21m"; shift
+	echo -e " Missing optional dependency $*\e[39m"
+
+	install-if-possible "$*"
 }
 
 COMMAND=cl-error
@@ -52,7 +68,7 @@ if [[ $1 == "--exit" ]]; then
 fi
 
 if ! hash "$1" 2>/dev/null; then
-	$COMMAND "${2:-"cl-depend"}" "Missing dependency $1"
+	$COMMAND "${2:-"cl-depend"}" "$1"
 	[[ $EXIT != no ]] && exit "$EXIT"
 fi
 
