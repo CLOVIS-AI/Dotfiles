@@ -32,6 +32,7 @@
 	pst = push --tags
 	psu = push --set-upstream
 	psr = "!b=$(git branch | grep \\* | cut -d \" \" -f2); for r in $(git remote); do announce \"Pushing $b to $r\"; git ps $r $b; done"
+	unpushed = !git changelog "$(git data --tracked).."
 	st = status -sb
 	stu = status -sb --untracked=all
 	sta = status
