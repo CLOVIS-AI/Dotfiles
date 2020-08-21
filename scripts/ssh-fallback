@@ -4,4 +4,9 @@
 # In ~/.ssh/config
 #   ssh-fallback %h %p proxy-server
 
+# Explanation
+# 1. Try to connect to the host locally.
+#    If it fails:
+# 2. Connect to the proxy via SSH.
+
 (timeout 0.1 nc -z "$1" "$2" 2>/dev/null) && nc "$1" "$2" || ssh -W "$1:$2" "$3"
