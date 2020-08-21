@@ -4,11 +4,11 @@
 autoload colors
 colors
 precmd() {
-	current_branch=$(git data --current 2>/dev/null || echo "none")
+	current_branch=$(git-data --current 2>/dev/null || echo "none")
 	autofetch_options=""
 	[[ $current_branch != "$last_branch" ]] && autofetch_options="--changelog"
 	last_branch=$current_branch
-	git autofetch $autofetch_options
+	git-autofetch $autofetch_options
 
 	PS1=''
 
@@ -31,7 +31,7 @@ precmd() {
 	# Git status
 	SED_PATTERN='s/^/ %F{yellow}/;'                                                                    # Yellow
 	SED_PATTERN+='s/[0-9]*↑/%F{green}&/;s/[0-9]*↓/%F{yellow}&/;s/⮁/%F{default}&/;s/×/%F{red}&/' # Ahead-after
-	PS1+="$(git data --status | sed "$SED_PATTERN")"
+	PS1+="$(git-data --status | sed "$SED_PATTERN")"
 
 	# Root or normal user?
 	PS1+=' %F{default}%(!.%F{red}⮕.→)'
