@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Usage:
+# In ~/.ssh/config
+#   ssh-fallback %h %p proxy-server
+
+(timeout 0.1 nc -z "$1" "$2" 2>/dev/null) && nc "$1" "$2" || ssh -W "$1:$2" "$3"
