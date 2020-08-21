@@ -45,7 +45,7 @@ remove)
     ;;
 purge)
     shift
-    announce sudo "pacman -Rncs --confirm $*"
+    announce sudo "pacman -Rsu --confirm $*"
     ;;
 search)
     shift

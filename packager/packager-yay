@@ -44,7 +44,7 @@ remove)
     ;;
 purge)
     shift
-    announce run "yay -Rncs --confirm $*"
+    announce run "yay -Rsu --confirm $*"
     ;;
 search)
     shift
