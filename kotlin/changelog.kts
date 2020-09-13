@@ -202,38 +202,42 @@ fun Stream<Pair<Type, Commit>>.display(withHeader: Boolean) {
 		Printer.title("Included modifications")
 	}
 
-	println()
-	val authors = data.map { it.second.author }.toHashSet()
-	val committers = data.map { it.second.committer }.toHashSet()
-
-	if (authors.size == 1) {
-		val author = authors.find { true }
-		Printer.text("Author: $author")
-	} else {
-		Printer.text("Authors: ${authors.joinToString(", ")}")
-	}
-
-	if (committers.size == 1) {
-		val committer = committers.find { true }
-		Printer.text("Committer: $committer")
-	} else {
-		Printer.text("Committers: ${committers.joinToString(", ")}")
-	}
-
-	for ((type, commits) in sorted) {
+	if (data.isNotEmpty()) {
 		println()
-		Printer.text(type.prettyName + ":")
+		val authors = data.map { it.second.author }.toHashSet()
+		val committers = data.map { it.second.committer }.toHashSet()
 
-		for (commit in commits) {
-			val message = StringBuilder().append(commit.subject).append(" (").append(commit.id)
-
-			if (commit.scope != null && commit.scope != "") {
-				message.append(", in ‘").append(commit.scope).append("’")
-			}
-
-			message.append(")")
-			Printer.item(message.toString())
+		if (authors.size == 1) {
+			val author = authors.find { true }
+			Printer.text("Author: $author")
+		} else {
+			Printer.text("Authors: ${authors.joinToString(", ")}")
 		}
+
+		if (committers.size == 1) {
+			val committer = committers.find { true }
+			Printer.text("Committer: $committer")
+		} else {
+			Printer.text("Committers: ${committers.joinToString(", ")}")
+		}
+
+		for ((type, commits) in sorted) {
+			println()
+			Printer.text(type.prettyName + ":")
+
+			for (commit in commits) {
+				val message = StringBuilder().append(commit.subject).append(" (").append(commit.id)
+
+				if (commit.scope != null && commit.scope != "") {
+					message.append(", in ‘").append(commit.scope).append("’")
+				}
+
+				message.append(")")
+				Printer.item(message.toString())
+			}
+		}
+	} else {
+		println("\nNo changes.")
 	}
 }
 
