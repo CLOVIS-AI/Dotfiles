@@ -39,6 +39,15 @@ sealed class Printer {
 			get() = this.replace("&", "&amp").replace("<", "&lt").replace(">", "&gt").replace("\"", "&quot").replace("\'", "&#39")
 	}
 
+	object Terminal : Printer() {
+		fun escape(code: Any) = "${27.toChar()}[${code}m"
+
+		override fun title(message: String) = println("${escape(1)}$message${escape(21)}  ")
+		override fun text(message: String) = println(message)
+		override fun item(message: String) = println("• $message")
+		override fun url(message: String, url: String) = println("$message ($url)")
+	}
+
 	companion object : Printer() {
 		lateinit var selected: Printer
 
@@ -53,11 +62,12 @@ if (argument(argIndex) == "--format") {
 	Printer.selected = when (argument(argIndex + 1)) {
 		"markdown" -> Printer.Markdown
 		"telegram-html" -> Printer.TelegramHtml
+		"colors" -> Printer.Terminal
 		else -> throw IllegalArgumentException("Invalid formatter: ${args[argIndex + 1]}")
 	}
 	argIndex += 2
 } else {
-	Printer.selected = Printer.Markdown
+	Printer.selected = Printer.Terminal
 }
 //endregion
 
