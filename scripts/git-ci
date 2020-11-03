@@ -19,16 +19,18 @@ function classic() {
 
 function braindot() {
 	announce-menu --title "Choose the type:" \
-		"build:build system, dependencies" \
+		"build:build system" \
 		"ci:CI/CD" \
 		"docs:documentation changes" \
 		"feat:new features:backward-compatible" \
 		"fix:fix problems:backward-compatible" \
+		"upgrade:dependency upgrades/modifications" \
 		"perf:better performances:backward-compatible" \
 		"refactor:internal changes to the implementation:backward-compatible" \
 		"style:grammar, coding style, linting..." \
 		"test:new tests, refactoring tests..." \
-		"breaking:breaking changes:backward-incompatible"
+		"breaking:breaking changes:backward-incompatible" \
+		"merge:merge commits"
 	TYPE=$(announce-menu-get)
 
 	# shellcheck disable=SC2046
