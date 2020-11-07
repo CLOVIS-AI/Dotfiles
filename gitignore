@@ -1,3 +1,6 @@
 # Emacs files
 *~
 \#*#
+
+# JetBrains temporary files
+$*$
