@@ -24,7 +24,7 @@ function ip_scan() {
 	echo -en "   Scanning...\r"
 	nmap_options=""
 	<<<"$address" grep ":" >/dev/null && nmap_options="-6"
-	nmap -sn $nmap_options "$address" 2>/dev/null | grep "Nmap scan report" | cut -f 5-6 -d ' ' | column -t
+	nmap -sn $nmap_options "$address" 2>/dev/null | grep "Nmap scan report" | cut -f 5-6 -d ' ' | sort | column -t
 }
 
 # ==================== MAIN MENU =========================================
