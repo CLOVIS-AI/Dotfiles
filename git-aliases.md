@@ -24,13 +24,8 @@ Display the list of people who committed to the repository:
 
 Display the status of the project (short):
 
-    git status -sb
-    git st
-
-Display the status of the project, including the complete list of untracked files (short):
-
     git status -sb --untracked=all
-    git stu
+    git st
 
 Display the status of the project (full):
 
@@ -71,10 +66,10 @@ Edit the last commit:
 
 Create a branch from the current HEAD and switch to it:
 
-    git branch [name] && git checkout [name]
+    git branch [name] && git switch [name]
     git checkout -b [name]
-    git switch -b [name]
-    git co [name]
+    git switch -c [name]
+    git ba [name]
 
 List local branches:
 

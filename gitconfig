@@ -34,10 +34,9 @@
 	psr = "!b=$(git branch | grep \\* | cut -d \" \" -f2); for r in $(git remote); do announce \"Pushing $b to $r\"; git ps $r $b; done"
 	unpushed = !git changelog "$(git data --tracked).."
 	unpulled = !git changelog "..$(git data --tracked)"
-	st = status -sb
-	stu = status -sb --untracked=all
+	st = status -sb --untracked=all
 	sta = status
-	co = checkout
+	co = switch
 	c = commit
 	cm = commit -m
 	ca = commit --amend
@@ -48,7 +47,7 @@
 	f = fetch
 	fr = fetch --all
 	b = branch
-	ba = checkout -b
+	ba = switch -c
 	bu = branch -u
 	bl = branch -vv
 	bd = branch -d
