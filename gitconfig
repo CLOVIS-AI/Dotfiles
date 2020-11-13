@@ -76,3 +76,5 @@
 	why-ignore = check-ignore -v --no-index
 	policy-merge = "!git config branch.$(git data --current).rebase false"
 	policy-rebase = "!git config branch.$(git data --current).rebase true"
+	rss = reset --soft
+	rsh = reset --hard
