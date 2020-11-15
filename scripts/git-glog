@@ -3,7 +3,7 @@
 git log \
     --color \
     --graph \
-    --pretty=tformat:'%Cred%h%Creset ->%C(yellow)③%d%Creset %s %n%Cgreen%cr③     %Cresetby %C(bold blue)%an %CredSIG:%G?%GS%Creset' \
+    --pretty=tformat:'%Cgreen%h ->%C(yellow)③%d%Creset %s %n%Creset%cr③     %Cresetby %C(bold blue)%an %CredSIG:%G?%GS%Creset' \
     --abbrev-commit \
     $* \
 	| sed -f ${CLOVIS_CONFIG:-$HOME/config}/sed-git-log.sed \
