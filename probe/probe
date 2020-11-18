@@ -1,38 +1,68 @@
 #!/bin/bash
 
+. cl-depend announce-menu "probe"
 . announce-menu --import
 
 # ===================== IP SCAN ==========================================
 
-function ip_scan() {
-	. cl-depend ip "probe/scan_ip"
-	. cl-depend nmap "probe/scan_ip"
+function select_interface() {
+	. cl-depend ip "probe/select_interface"
+
 	interfaces=$(ip link show | grep -v '    ' | cut -f 2 -d ' ' | cut -f 1 -d ':')
 
 	# shellcheck disable=SC2086
 	announce-menu --title "Which interface do you want to scan?" \
 		$interfaces
 	interface=$(announce-menu-get)
+}
 
-	addresses=$(ip address list "$interface" | grep inet | tr -s ' ' | cut -f 3 -d ' ')
+function select_network_from_interface() {
+	. cl-depend ip "probe/select_network_from_interface"
+
+	addresses=$(ip address list "$1" | grep inet | tr -s ' ' | cut -f 3 -d ' ')
 
 	# shellcheck disable=SC2086
 	announce-menu -d ' ' --title "Which address do you want to use?" \
 		$addresses
 	address=$(announce-menu-get)
+}
+
+function ip_scan() {
+	. cl-depend nmap "probe/scan_ip"
+
+	select_interface
+	select_network_from_interface "$interface"
 
 	echo -en "   Scanning...\r"
 	nmap_options=""
-	<<<"$address" grep ":" >/dev/null && nmap_options="-6"
+	grep <<<"$address" ":" >/dev/null && nmap_options="-6"
 	nmap -sn $nmap_options "$address" 2>/dev/null | grep "Nmap scan report" | cut -f 5-6 -d ' ' | sort | column -t
+}
+
+# ==================== Network Scan ======================================
+
+function net_scan() {
+	. cl-depend iftop "probe/scan_net"
+
+	select_interface
+	select_network_from_interface "$interface"
+
+	announce -nn "Give an estimation of the maximum throughput, ending with K, M, or G:"
+	read throughput
+
+	announce sudo iftop -i "$interface" -F "$address" -m "$throughput"
 }
 
 # ==================== MAIN MENU =========================================
 
 announce-menu --title "Welcome to Probe. What do you want to do?" \
-	"scan-ip:Scan local network"
+	"scan-ip:Find other connected machines" \
+	"scan-network:Display the network usage (requires root access)"
 case $(announce-menu-get) in
 scan-ip)
 	ip_scan
+	;;
+scan-network)
+	net_scan
 	;;
 esac
