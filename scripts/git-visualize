@@ -1,0 +1,26 @@
+#!/bin/bash
+
+. cl-depend announce
+. cl-depend gource
+. cl-depend ffmpeg
+. announce-menu --import
+
+announce -nn "How many seconds per day?"
+read secondsperday
+
+announce -nn "How many seconds per skipped day?"
+read secondsperskipped
+
+announce-menu --title "Which format do you want to use?" \
+	"libx264:Older, takes more space" \
+	"libx265:Newer, smaller files but doesn't work everywhere"
+format=$(announce-menu-get)
+
+announce -nn 'Whats your preferred bitrate? (recommended: 20-30, lower is better)'
+read bitrate
+
+announce run gource -1280x720 --seconds-per-day "$secondsperday" --auto-skip-seconds "$secondsperskipped" -o - | ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i - -vcodec libx264 -preset ultrafast -pix_fmt yuv420p -crf 1 -threads 0 -bf 0 vis.mp4 || exit 4
+
+announce run ffmpeg -i vis.mp4 -vcodec "$format" -crf "$bitrate" "vis-$format.mp4" || exit 5
+
+trash vis.mp4
