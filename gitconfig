@@ -78,3 +78,4 @@
 	policy-rebase = "!git config branch.$(git data --current).rebase true"
 	rss = reset --soft
 	rsh = reset --hard
+	rsh-tracked = "!git stash; git reset --hard $(git data --tracked); git stash pop;"
