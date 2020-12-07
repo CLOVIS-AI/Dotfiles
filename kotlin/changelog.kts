@@ -30,13 +30,18 @@ sealed class Printer {
 		//language=HTML
 		override fun title(message: String) = println("<strong>$message</strong>")
 		override fun text(message: String) = println(message)
-		override fun item(message: String) = println("· $message")
+		override fun item(message: String) = println("• $message")
 
 		//language=HTML
 		override fun url(message: String, url: String) = println("<a href='$url'>$message</a>")
 
 		val String.escaped: String
-			get() = this.replace("&", "&amp").replace("<", "&lt").replace(">", "&gt").replace("\"", "&quot").replace("\'", "&#39")
+			get() = this
+				.replace("&", "&amp")
+				.replace("<", "&lt")
+				.replace(">", "&gt")
+				.replace("\"", "&quot")
+				.replace("\'", "&#39")
 	}
 
 	object Terminal : Printer() {
