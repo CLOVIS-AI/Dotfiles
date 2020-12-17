@@ -2,73 +2,78 @@
 
 case $1 in
 enabled)
-    hash pacman 2>/dev/null || (echo "'pacman' is not installed."; exit 1)
-    ;;
+	hash pacman 2>/dev/null || (
+		echo "'pacman' is not installed."
+		exit 1
+	)
+	;;
 name)
-    echo -n "ArchLinux packages (AUR excluded)"
-    ;;
+	echo -n "ArchLinux packages (AUR excluded)"
+	;;
 install)
-    shift
-    announce sudo "pacman -S --needed $*"
-    ;;
+	shift
+	announce sudo "pacman -S --needed $*"
+	;;
 upgrade)
-    shift
-    announce sudo "pacman -Syyuu $*"
-    announce sudo "pacman -Fy"
-    ;;
+	shift
+	announce sudo "pacman -Syuu $*"
+	announce sudo "pacman -Fy"
+	;;
 clean)
-    announce "Unneeded/orphan packages:"
-    pacman -Qdt
-    announce -nn "Do you want to remove them? (y/N)"
-    read -r CHOICE
-    case $CHOICE in
-    y|Y)
-        packager --tool packager-pacman remove "$(pacman -Qdt)"
-        ;;
-    esac
-    announce "Cleaning of the package cache:"
-    echo " u. Remove uninstalled packages from the cache"
-    echo " i. Remove everything from the cache (not recommended)"
-    echo " n. Do not clean the cache"
-    announce -nn "Do you want to clean the cache? (u/i/N)"
-    read -r CHOICE
-    case $CHOICE in
-    u)
-        announce sudo "pacman -Sc";;
-    i)
-        announce sudo "pacman -Scc";;
-    esac
-    ;;
+	announce "Unneeded/orphan packages:"
+	pacman -Qdt
+	announce -nn "Do you want to remove them? (y/N)"
+	read -r CHOICE
+	case $CHOICE in
+	y | Y)
+		packager --tool packager-pacman remove "$(pacman -Qdt)"
+		;;
+	esac
+	announce "Cleaning of the package cache:"
+	echo " u. Remove uninstalled packages from the cache"
+	echo " i. Remove everything from the cache (not recommended)"
+	echo " n. Do not clean the cache"
+	announce -nn "Do you want to clean the cache? (u/i/N)"
+	read -r CHOICE
+	case $CHOICE in
+	u)
+		announce sudo "pacman -Sc"
+		;;
+	i)
+		announce sudo "pacman -Scc"
+		;;
+	esac
+	;;
 remove)
-    shift
-    announce sudo "pacman -R --confirm $*"
-    ;;
+	shift
+	announce sudo "pacman -R --confirm $*"
+	;;
 purge)
-    shift
-    announce sudo "pacman -Rsu --confirm $*"
-    ;;
+	shift
+	announce sudo "pacman -Rsu --confirm $*"
+	;;
 search)
-    shift
-    announce "Where do you want to search on?"
-    echo " 0. All packages"
-    echo " 1. Installed packages"
-    echo " 2. Search for a file"
-    announce -nn "Your choice:"
-    read -r CHOICE
-    case $CHOICE in
-    0|a|all)
-        announce sudo "pacman -Ss $*"
-        ;;
-    1|i|installed)
-        announce sudo "pacman -Qi $*"
-        ;;
-    2|f|file)
-        announce sudo "pacman -F $*"
-        ;;
-    esac
-    ;;
+	shift
+	announce "Where do you want to search on?"
+	echo " 0. All packages"
+	echo " 1. Installed packages"
+	echo " 2. Search for a file"
+	announce -nn "Your choice:"
+	read -r CHOICE
+	case $CHOICE in
+	0 | a | all)
+		announce sudo "pacman -Ss $*"
+		;;
+	1 | i | installed)
+		announce sudo "pacman -Qi $*"
+		;;
+	2 | f | file)
+		announce sudo "pacman -F $*"
+		;;
+	esac
+	;;
 *)
-    announce "Invalid command '$1'."
-    exit 2
-    ;;
+	announce "Invalid command '$1'."
+	exit 2
+	;;
 esac

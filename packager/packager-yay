@@ -6,70 +6,75 @@
 
 case $1 in
 enabled)
-    hash yay 2>/dev/null || (echo "'yay' is not installed."; exit 1)
-    ;;
+	hash yay 2>/dev/null || (
+		echo "'yay' is not installed."
+		exit 1
+	)
+	;;
 name)
-    echo -n "ArchLinux packages (AUR included)"
-    ;;
+	echo -n "ArchLinux packages (AUR included)"
+	;;
 install)
-    shift
-    announce run "yay -S --needed $*"
-    ;;
+	shift
+	announce run "yay -S --needed $*"
+	;;
 upgrade)
-    shift
-    announce run "yay -Syyuu $*"
-    announce run "yay -Fy"
-    ;;
+	shift
+	announce run "yay -Syuu $*"
+	announce run "yay -Fy"
+	;;
 clean)
-    announce "Unneeded/orphan packages:"
-    yay -Qdt
+	announce "Unneeded/orphan packages:"
+	yay -Qdt
 	announce-menu --title "Do you want to remove them?" --default "no" "yes" "no"
-    if announce-menu --chosen "yes"; then
-        packager --tool packager-yay remove "$(yay -Qdt | cut -d ' ' -f 1)"
-    fi
-    announce-menu --title "Cleaning of the package cache:" --default "no" \
-    	"uninstalled:Remove uninstalled packages from the cache" \
-    	"full:Remove everything from the cache" \
-    	"no:Do not clean the cache"
-    case $(announce-menu-get) in
-    uninstalled)
-        announce run "yay -Sc";;
-    full)
-        announce run "yay -Scc";;
-    esac
-    ;;
+	if announce-menu --chosen "yes"; then
+		packager --tool packager-yay remove "$(yay -Qdt | cut -d ' ' -f 1)"
+	fi
+	announce-menu --title "Cleaning of the package cache:" --default "no" \
+		"uninstalled:Remove uninstalled packages from the cache" \
+		"full:Remove everything from the cache" \
+		"no:Do not clean the cache"
+	case $(announce-menu-get) in
+	uninstalled)
+		announce run "yay -Sc"
+		;;
+	full)
+		announce run "yay -Scc"
+		;;
+	esac
+	;;
 remove)
-    shift
-    announce run "yay -R --confirm $*"
-    ;;
+	shift
+	announce run "yay -R --confirm $*"
+	;;
 purge)
-    shift
-    announce run "yay -Rsu --confirm $*"
-    ;;
+	shift
+	announce run "yay -Rsu --confirm $*"
+	;;
 search)
-    shift
-    announce-menu --title "Where do you want to search on?" \
-    	"all:Search for a package with this name" \
-    	"installed:Give me information on this package I installed" \
-    	"file:Which package owns this file?" \
-    	"files:Which files owns this package?"
-    case $(announce-menu-get) in
-    all)
-        announce run "yay -Ss $*"
-        ;;
-    installed)
-        announce run "yay -Qi $*"
-        ;;
-    file)
-        announce run "yay -F $*"
-        ;;
-    files)
-    	announce run "yay -Ql $*"
-    	;;
-    esac
-    ;;
+	shift
+	announce-menu --title "Where do you want to search on?" \
+		"all:Search for a package with this name" \
+		"installed:Give me information on this package I installed" \
+		"file:Which package owns this file?" \
+		"files:Which files owns this package?"
+	case $(announce-menu-get) in
+	all)
+		announce run "yay -Ss $*"
+		;;
+	installed)
+		announce run "yay -Qi $*"
+		;;
+	file)
+		announce run "yay -F $*"
+		;;
+	files)
+		announce run "yay -Ql $*"
+		;;
+	esac
+	;;
 *)
-    announce "Invalid command '$1'."
-    exit 2
-    ;;
+	announce "Invalid command '$1'."
+	exit 2
+	;;
 esac
