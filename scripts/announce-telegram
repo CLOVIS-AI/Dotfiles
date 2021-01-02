@@ -1,5 +1,21 @@
 #!/bin/bash
 
+#
+# announce-telegram
+#
+# Sends a message to a Telegram chat via the Bot API
+#
+# Usage:
+#	announce-telegram <msg> <chats>
+#
+# Options:
+# 	msg:		a file with the message to send
+#	chats:		a file with the IDs of chats the message should be sent to (one ID per line)
+#
+# Environment variables:
+#	BOT_TOKEN:	the token to connect to the Bot API
+#
+
 if [[ $# != 2 ]]
 then
     announce "Expected 2 arguments, a file with the message, and a file with the list of chats."
