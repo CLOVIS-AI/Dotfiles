@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#
+# announce-discord
+#
+# Sends a message to a Discord chat.
+#
+# Usage:
+#	announce-discord <msg> <chat> <token>
+#
+# Options:
+#   msg:	a file with the message to send (in JSON)
+#	chat:	the ID of the chat to send the message to
+#	token:	the token of the webhook
+#
+
+if [[ $# != 3 ]]; then
+	announce "Expected 3 arguments"
+	exit 1
+fi
+
+if [[ ! -f $1 ]]; then
+	announce "File $1 doesn't exist."
+	exit 1
+fi
+
+announce "Sending message."
+echo "START OF MESSAGE"
+cat $1
+echo "END OF MESSAGE"
+
+curl -v "https://discord.com/api/webhooks/$3/$2" -X POST -m 10000 -H "Content-Type: application/json" -d "@$1"
