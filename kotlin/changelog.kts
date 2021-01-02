@@ -4,8 +4,11 @@
 
 import Changelog.Type.*
 import java.io.BufferedReader
+import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.Stream
+import kotlin.collections.LinkedHashMap
+import kotlin.random.Random
 
 //region Argument handling
 var argIndex = 0
@@ -40,94 +43,92 @@ sealed class Printer {
 	}
 
 	object Discord : Printer() {
-		private var wasMainTitle = false
+		private val randomColor get() = Random.nextInt(999999)
+		private const val infos = "INFOS"
+
+		private val data = LinkedHashMap<String, MutableList<String>>()
+		private var current: String? = null
 			set(value) {
 				field = value
-				if (!field && mainInfo.isNotEmpty()) {
-					//language=JSON
-					print(
-						"""
-						{
-							"name": "Infos",
-							"value": "${mainInfo.joinToString(separator = "\\n - ", prefix = "- ")}
-					""".trimIndent()
-					)
-					mainInfo.clear()
-				}
+				System.err.println("→ scope: '${value?.removePrefix("\n")}'")
 			}
-		private val mainInfo = mutableListOf<String>()
-		private var url: String? = null
 
 		override fun title(message: String) {
-			wasMainTitle = false
-			if (message.startsWith("Changelog")) {
-				println(
-					"""
-							"title": "$message",
-							"fields": [
-							""".trimIndent()
-				)
-				wasMainTitle = true
-			} else if (message != "Included modifications") {
-				error("Doesn't know what to do with the title '$message'")
+			System.err.println("→ title: $message")
+			when {
+				"Changelog" in message -> {
+					current = infos
+					data[infos] = mutableListOf()
+				}
+				"Included modifications" in message -> current = null
 			}
 		}
 
 		override fun text(message: String) {
-			if (wasMainTitle &&
-				(message.startsWith("Git options")
-						|| message.startsWith("Author")
-						|| message.startsWith("Committer")
-						|| "No changes" in message)
-			) {
-				mainInfo += message.removePrefix("\n")
-			} else {
-				wasMainTitle = false
-				print(
-					""""
-					},
-					{
-						"name": "${message.removeSuffix(":").removePrefix("\n")}",
-						"value": "
-					""".trimIndent()
-				)
+			System.err.println("→ text: $message")
+			when {
+				current == infos && !message.startsWith("\n") -> {
+					data[infos].add(message)
+						?: error("Could not find the current scope: '$current'")
+				}
+				message.startsWith("Author") || message.startsWith("Committer") -> {
+					data[infos].add(message)
+						?: error("Could not find the current scope: '$current'")
+				}
+				else -> {
+					current = message
+					data[message] = mutableListOf()
+				}
 			}
 		}
 
 		override fun item(message: String) {
-			print("- $message\\n")
+			System.err.println("→ item: $message")
+			data[current].add(message)
+				?: error("Could not find the current scope: '$current'")
 		}
 
 		override fun url(message: String, url: String) {
-			this.url = url
+			System.err.println("→ url: $message")
 		}
 
-		override fun start() {
+		override fun end() {
+			for ((title, items) in data) {
+				System.err.println(title.removePrefix("\n"))
+				items.forEach { System.err.println(" - $it") }
+				System.err.println()
+			}
+
+			//language=JSON
+			fun generateSection(section: String) = """
+				{
+					"color": $randomColor,
+					"title": "${section.removePrefix("\n").removeSuffix(":")}",
+					"description": "${
+				data[section]!!.joinToString(
+					separator = "\\n • ",
+					prefix = " • "
+				)
+			}"
+				}
+			""".trimIndent()
+
+			fun generateSections() = data.keys.filter { it != infos }.joinToString(
+				separator = ", ",
+				transform = ::generateSection
+			)
+
+			fun generateHeader() = "> **${data[infos]!![0]}**" +
+					data[infos]!!.subList(1, data[infos]!!.size).joinToString(separator = "\\n> ")
+
 			//language=JSON
 			println(
 				"""
 				{
-				    "embeds": [
-						{
-							"author": {
-								"name": "Git Changelog",
-								"url": "https://gitlab.com/clovis-ai/dotfiles",
-								"icon_url": "https://upload.wikimedia.org/wikipedia/commons/1/18/GitLab_Logo.svg"
-							},
-							"color": 15094568,
-			""".trimIndent()
-			)
-		}
-
-		override fun end() {
-			wasMainTitle = false
-			//language=JSON
-			println(
-				""""
-						}
-					]${if (url != null) """, "url": "$url"""" else ""}
-				}
-				]
+					"content": "${generateHeader()}",
+					"embeds": [
+						${generateSections()}
+					]
 				}
 			""".trimIndent()
 			)
