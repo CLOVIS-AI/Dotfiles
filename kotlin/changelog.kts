@@ -19,6 +19,9 @@ sealed class Printer {
 	abstract fun item(message: String)
 	abstract fun url(message: String, url: String)
 
+	open fun start() = Unit
+	open fun end() = Unit
+
 	object Markdown : Printer() {
 		override fun title(message: String) = println("# $message")
 		override fun text(message: String) = println(message)
@@ -34,14 +37,101 @@ sealed class Printer {
 
 		//language=HTML
 		override fun url(message: String, url: String) = println("<a href='$url'>$message</a>")
+	}
 
-		val String.escaped: String
-			get() = this
-				.replace("&", "&amp")
-				.replace("<", "&lt")
-				.replace(">", "&gt")
-				.replace("\"", "&quot")
-				.replace("\'", "&#39")
+	object Discord : Printer() {
+		private var wasMainTitle = false
+			set(value) {
+				field = value
+				if (!field && mainInfo.isNotEmpty()) {
+					//language=JSON
+					print(
+						"""
+						{
+							"name": "Infos",
+							"value": "${mainInfo.joinToString(separator = "\\n - ", prefix = "- ")}
+					""".trimIndent()
+					)
+					mainInfo.clear()
+				}
+			}
+		private val mainInfo = mutableListOf<String>()
+		private var url: String? = null
+
+		override fun title(message: String) {
+			wasMainTitle = false
+			if (message.startsWith("Changelog")) {
+				println(
+					"""
+							"title": "$message",
+							"fields": [
+							""".trimIndent()
+				)
+				wasMainTitle = true
+			} else if (message != "Included modifications") {
+				error("Doesn't know what to do with the title '$message'")
+			}
+		}
+
+		override fun text(message: String) {
+			if (wasMainTitle &&
+				(message.startsWith("Git options")
+						|| message.startsWith("Author")
+						|| message.startsWith("Committer")
+						|| "No changes" in message)
+			) {
+				mainInfo += message.removePrefix("\n")
+			} else {
+				wasMainTitle = false
+				print(
+					""""
+					},
+					{
+						"name": "${message.removeSuffix(":").removePrefix("\n")}",
+						"value": "
+					""".trimIndent()
+				)
+			}
+		}
+
+		override fun item(message: String) {
+			print("- $message\\n")
+		}
+
+		override fun url(message: String, url: String) {
+			this.url = url
+		}
+
+		override fun start() {
+			//language=JSON
+			println(
+				"""
+				{
+				    "embeds": [
+						{
+							"author": {
+								"name": "Git Changelog",
+								"url": "https://gitlab.com/clovis-ai/dotfiles",
+								"icon_url": "https://upload.wikimedia.org/wikipedia/commons/1/18/GitLab_Logo.svg"
+							},
+							"color": 15094568,
+			""".trimIndent()
+			)
+		}
+
+		override fun end() {
+			wasMainTitle = false
+			//language=JSON
+			println(
+				""""
+						}
+					]${if (url != null) """, "url": "$url"""" else ""}
+				}
+				]
+				}
+			""".trimIndent()
+			)
+		}
 	}
 
 	object Terminal : Printer() {
@@ -68,12 +158,15 @@ if (argument(argIndex) == "--format") {
 		"markdown" -> Printer.Markdown
 		"telegram-html" -> Printer.TelegramHtml
 		"colors" -> Printer.Terminal
+		"discord" -> Printer.Discord
 		else -> throw IllegalArgumentException("Invalid formatter: ${args[argIndex + 1]}")
 	}
 	argIndex += 2
 } else {
 	Printer.selected = Printer.Terminal
 }
+
+Printer.selected.start()
 //endregion
 
 //region Title
@@ -286,3 +379,5 @@ if (commitRange == "incoming") {
 val projectUrl: String? = System.getenv("CI_PROJECT_URL")
 if (projectUrl != null) Printer.url("Project URL", projectUrl)
 //endregion
+
+Printer.selected.end()
