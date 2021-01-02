@@ -314,9 +314,9 @@ fun Stream<Pair<Type, Commit>>.display(withHeader: Boolean) {
 
 	if (withHeader) {
 		println()
-		shell("git show -s --format=\"%s%n%n%b%n%nMerger: %cn\" | sed 's|See merge " + "request \\(.*\\)!\\(.*\\)\$|More information: https://gitlab.com/\\1/-/merge_requests/\\2|'")
+		shell("git show -s --format=\"%s%n%n%b%n%nMerger: %cn\" | uniq | sed 's|See merge " + "request \\(.*\\)!\\(.*\\)\$|More information: https://gitlab.com/\\1/-/merge_requests/\\2|'")
 			.lines()
-			.forEach(::println)
+			.forEach(Printer.selected::text)
 
 		println()
 		Printer.title("Included modifications")
