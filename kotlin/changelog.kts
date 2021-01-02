@@ -97,7 +97,19 @@ if (argument(argIndex) == "--incoming") {
 
 //region Sorting
 enum class Type(val prettyName: String) {
-	BUILD("Build"), CI("CI/CD"), DOC("Documentation"), FEAT("New features"), FIX("Fixes"), PERF("Performance " + "improvements"), REFACTOR("Internal modifications"), STYLE("Style modifications"), TEST("Tests"), BREAKING("Breaking" + " changes"), MERGE("Merges"), UNKNOWN("Unsorted"), UPGRADE("Dependencies")
+	BUILD("Build"),
+	CI("CI/CD"),
+	DOC("Documentation"),
+	FEAT("New features"),
+	FIX("Fixes"),
+	PERF("Performance " + "improvements"),
+	REFACTOR("Internal modifications"),
+	STYLE("Style modifications"),
+	TEST("Tests"),
+	BREAKING("Breaking" + " changes"),
+	MERGE("Merges"),
+	UNKNOWN("Unsorted"),
+	UPGRADE("Dependencies")
 }
 
 fun Commit.findType(): Pair<Type, Commit> = with(subject) {
@@ -146,7 +158,13 @@ fun Stream<Commit>.findType() = map { it.findType() }
 //endregion
 
 //region Commit data
-data class Commit(val id: String, val author: String, val committer: String, val subject: String, val scope: String? = null)
+data class Commit(
+	val id: String,
+	val author: String,
+	val committer: String,
+	val subject: String,
+	val scope: String? = null
+)
 
 fun Commit.withScope(): Commit {
 	val semicolon = subject.indexOf(':')
@@ -193,15 +211,19 @@ fun BufferedReader.collectAsString(): String {
 	return line.trim('\n')
 }
 
-fun Stream<String>.getCommitInformation() = map { shell("git show --quiet --pretty=\"%h::::%an::::%cn::::%s\" $it").collectAsString() }
+fun Stream<String>.getCommitInformation() =
+	map { shell("git show --quiet --pretty=\"%h::::%an::::%cn::::%s\" $it").collectAsString() }
 
 fun Stream<Pair<Type, Commit>>.display(withHeader: Boolean) {
 	val data = collect(Collectors.toList())
-	val sorted = data.groupBy { it.first }.map { entry -> entry.key to entry.value.map { it.second } }
+	val sorted =
+		data.groupBy { it.first }.map { entry -> entry.key to entry.value.map { it.second } }
 
 	if (withHeader) {
 		println()
-		shell("git show -s --format=\"%s%n%n%b%n%nMerger: %cn\" | sed 's|See merge " + "request \\(.*\\)!\\(.*\\)\$|More information: https://gitlab.com/\\1/-/merge_requests/\\2|'").lines().forEach(::println)
+		shell("git show -s --format=\"%s%n%n%b%n%nMerger: %cn\" | sed 's|See merge " + "request \\(.*\\)!\\(.*\\)\$|More information: https://gitlab.com/\\1/-/merge_requests/\\2|'")
+			.lines()
+			.forEach(::println)
 
 		println()
 		Printer.title("Included modifications")
@@ -227,8 +249,7 @@ fun Stream<Pair<Type, Commit>>.display(withHeader: Boolean) {
 		}
 
 		for ((type, commits) in sorted) {
-			println()
-			Printer.text(type.prettyName + ":")
+			Printer.text("\n" + type.prettyName + ":")
 
 			for (commit in commits) {
 				val message = StringBuilder().append(commit.subject).append(" (").append(commit.id)
@@ -242,14 +263,17 @@ fun Stream<Pair<Type, Commit>>.display(withHeader: Boolean) {
 			}
 		}
 	} else {
-		println("\nNo changes.")
+		Printer.text("\nNo changes.")
 	}
 }
 
-fun Stream<String>.startPipeline(withHeader: Boolean) = this.parallel().getCommitInformation().asCommits().findType().display(withHeader)
+fun Stream<String>.startPipeline(withHeader: Boolean) =
+	this.parallel().getCommitInformation().asCommits().findType().display(withHeader)
 
 if (commitRange == "incoming") {
-	shell("git blog --exclude-first | grep \"current\" | sed -e 's/current://;s/^\\(.\\{7\\}\\).*/\\1/'").lines().startPipeline(true)
+	shell("git blog --exclude-first | grep \"current\" | sed -e 's/current://;s/^\\(.\\{7\\}\\).*/\\1/'")
+		.lines()
+		.startPipeline(true)
 } else {
 	shell("git log --pretty=format:'%h' $commitRange").lines().startPipeline(false)
 }
