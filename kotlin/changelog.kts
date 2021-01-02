@@ -241,11 +241,13 @@ fun Stream<Pair<Type, Commit>>.display(withHeader: Boolean) {
 			Printer.text("Authors: ${authors.joinToString(", ")}")
 		}
 
-		if (committers.size == 1) {
-			val committer = committers.find { true }
-			Printer.text("Committer: $committer")
-		} else {
-			Printer.text("Committers: ${committers.joinToString(", ")}")
+		if (committers != authors) {
+			if (committers.size == 1) {
+				val committer = committers.find { true }
+				Printer.text("Committer: $committer")
+			} else {
+				Printer.text("Committers: ${committers.joinToString(", ")}")
+			}
 		}
 
 		for ((type, commits) in sorted) {
