@@ -7,7 +7,6 @@ import java.io.BufferedReader
 import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.Stream
-import kotlin.collections.LinkedHashMap
 import kotlin.random.Random
 
 //region Argument handling
@@ -68,11 +67,11 @@ sealed class Printer {
 			System.err.println("→ text: $message")
 			when {
 				current == infos && !message.startsWith("\n") -> {
-					data[infos]?.add(message)
+					data[infos].add(message)
 						?: error("Could not find the current scope: '$current'")
 				}
 				message.startsWith("Author") || message.startsWith("Committer") -> {
-					data[infos]?.add(message)
+					data[infos].add(message)
 						?: error("Could not find the current scope: '$current'")
 				}
 				else -> {
@@ -84,7 +83,7 @@ sealed class Printer {
 
 		override fun item(message: String) {
 			System.err.println("→ item: $message")
-			data[current]?.add(message)
+			data[current].add(message)
 				?: error("Could not find the current scope: '$current'")
 		}
 
@@ -105,7 +104,7 @@ sealed class Printer {
 					"color": $randomColor,
 					"title": "${section.removePrefix("\n").removeSuffix(":")}",
 					"description": "${
-				data[section]!!.joinToString(
+				data[section]!!.map { it.escape() }.joinToString(
 					separator = "\\n • ",
 					prefix = " • "
 				)
@@ -119,7 +118,8 @@ sealed class Printer {
 			)
 
 			fun generateHeader() = "> **${data[infos]!![0]}**" +
-					data[infos]!!.subList(1, data[infos]!!.size).joinToString(separator = "\\n> ")
+					data[infos]!!.subList(1, data[infos]!!.size).map { it.escape() }
+						.joinToString(separator = "\\n> ")
 
 			//language=JSON
 			println(
@@ -133,6 +133,13 @@ sealed class Printer {
 			""".trimIndent()
 			)
 		}
+
+		private fun String.escape() = this
+			.replace("\"", "\\\"")
+			.replace("\t", "\\t")
+			.replace("\b", "\\b")
+			.replace("\r", "\\r")
+			.replace("\n", "\\n")
 	}
 
 	object Terminal : Printer() {
