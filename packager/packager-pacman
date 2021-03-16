@@ -1,5 +1,9 @@
 #!/bin/bash
 
+. cl-depend announce "packager-yay"
+. cl-depend announce-menu "packager-yay"
+. announce-menu --import
+
 case $1 in
 enabled)
 	hash pacman 2>/dev/null || (
@@ -54,24 +58,22 @@ purge)
 	;;
 search)
 	shift
-	announce "Where do you want to search on?"
-	echo " 0. All packages"
-	echo " 1. Installed packages"
-	echo " 2. Search for a file"
-	announce -nn "Your choice:"
-	read -r CHOICE
-	case $CHOICE in
-	0 | a | all)
+	announce-menu --title "Where do you want to search on?" \
+		"all:Search for a package with this name" \
+		"installed:Give me information on this package I installed" \
+		"file:Where can I find this file?" \
+		"files:Show the contents of this package"
+	case $(announce-menu-get) in
+	all)
 		announce run "pacman -Ss $*"
 		;;
-	1 | i | installed)
+	installed)
 		announce run "pacman -Qi $*"
 		;;
-	2 | f | file)
+	file)
 		announce run "pacman -F $*"
 		;;
 	esac
-	;;
 *)
 	announce "Invalid command '$1'."
 	exit 2

@@ -56,8 +56,8 @@ search)
 	announce-menu --title "Where do you want to search on?" \
 		"all:Search for a package with this name" \
 		"installed:Give me information on this package I installed" \
-		"file:Which package owns this file?" \
-		"files:Which files owns this package?"
+		"file:Where can I find this file?" \
+		"files:Show the contents of this package"
 	case $(announce-menu-get) in
 	all)
 		announce run "yay -Ss $*"
