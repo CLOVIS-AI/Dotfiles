@@ -73,6 +73,9 @@ search)
 	file)
 		announce run "pacman -F $*"
 		;;
+	files)
+		announce run "pacman -Ql $*"
+		;;
 	esac
 *)
 	announce "Invalid command '$1'."
