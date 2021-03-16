@@ -62,13 +62,13 @@ search)
 	read -r CHOICE
 	case $CHOICE in
 	0 | a | all)
-		announce sudo "pacman -Ss $*"
+		announce run "pacman -Ss $*"
 		;;
 	1 | i | installed)
-		announce sudo "pacman -Qi $*"
+		announce run "pacman -Qi $*"
 		;;
 	2 | f | file)
-		announce sudo "pacman -F $*"
+		announce run "pacman -F $*"
 		;;
 	esac
 	;;
