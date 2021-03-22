@@ -1,6 +1,8 @@
-FROM archlinux:latest
+FROM alpine:latest
 
-RUN pacman -Sy --noconfirm git openssh curl zip unzip which jre-openjdk jdk-openjdk
+RUN apk add --no-cache \
+	git openssh curl zip unzip which bash \
+	openjdk11
 
 SHELL ["/bin/bash", "-c"]
 
