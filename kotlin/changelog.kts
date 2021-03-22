@@ -67,11 +67,11 @@ sealed class Printer {
 			System.err.println("→ text: $message")
 			when {
 				current == infos && !message.startsWith("\n") -> {
-					data[infos].add(message)
+					data[infos]?.add(message)
 						?: error("Could not find the current scope: '$current'")
 				}
 				message.startsWith("Author") || message.startsWith("Committer") -> {
-					data[infos].add(message)
+					data[infos]?.add(message)
 						?: error("Could not find the current scope: '$current'")
 				}
 				else -> {
@@ -83,7 +83,7 @@ sealed class Printer {
 
 		override fun item(message: String) {
 			System.err.println("→ item: $message")
-			data[current].add(message)
+			data[current]?.add(message)
 				?: error("Could not find the current scope: '$current'")
 		}
 
