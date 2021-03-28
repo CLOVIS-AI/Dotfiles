@@ -23,7 +23,7 @@ function work() {
 		# shellcheck disable=SC2076
 		if [[ " ${master[@]} " =~ " $commit " ]]; then # the commit is on master
 			# shellcheck disable=SC2013
-			for parent in $(cut <<<"$line" -d ' ' -f 1 --complement); do
+			for parent in $(cut <<<"$line" -d ' ' -f 2-); do
 				master[${#master[@]}]=$parent
 				echo "main:$parent"
 			done
