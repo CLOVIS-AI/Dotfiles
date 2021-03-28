@@ -1,43 +1,44 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 case $1 in
 enabled)
-    hash raco      2>/dev/null || (echo "'raco' is not installed."; exit 1)
-    ;;
+	hash raco 2>/dev/null || (
+		echo "'raco' is not installed."
+		exit 1
+	)
+	;;
 name)
-    echo -en "Racket dependencies"
-    ;;
+	echo -en "Racket dependencies"
+	;;
 install)
-    shift
-    announce run "raco pkg install $*"
-    ;;
+	shift
+	announce run "raco pkg install $*"
+	;;
 upgrade)
-    shift
-    if [[ $# == 0 ]]
-    then
-        announce run "raco pkg update --all"
-    else
-        announce run "raco pkg update $*"
-    fi
-    ;;
+	shift
+	if [[ $# == 0 ]]; then
+		announce run "raco pkg update --all"
+	else
+		announce run "raco pkg update $*"
+	fi
+	;;
 purge)
-    shift
-    announce run "raco pkg remove --auto $*"
-    ;;
+	shift
+	announce run "raco pkg remove --auto $*"
+	;;
 remove)
-    shift
-    announce run "raco pkg remove $*"
-    ;;
+	shift
+	announce run "raco pkg remove $*"
+	;;
 search)
-    shift
-    announce "This operation is not supported."
-    echo "The official catalogs are:"
-    echo " - https://pkgs.racket-lang.org"
-    echo " - http://planet-compats.racket-lang.org"
-    ;;
+	shift
+	announce "This operation is not supported."
+	echo "The official catalogs are:"
+	echo " - https://pkgs.racket-lang.org"
+	echo " - http://planet-compats.racket-lang.org"
+	;;
 *)
-    announce "Invalid command '$1'."
-    exit 2
-    ;;
+	announce "Invalid command '$1'."
+	exit 2
+	;;
 esac
-

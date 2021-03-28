@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # cl-depend by Ivan Canet
@@ -20,7 +20,7 @@
 #						the error/warning message.
 #
 
-function install-if-possible {
+function install-if-possible() {
 	if hash packager 2>/dev/null; then
 		. announce-menu --import
 		announce-menu --title "Do you want to install $*?" \
@@ -32,13 +32,15 @@ function install-if-possible {
 	fi
 }
 
-function cl-error {
+function cl-error() {
 	if [[ $1 == "--exit" ]]; then
 		QUIT=$2
-		shift; shift
+		shift
+		shift
 	fi
 
-	echo -en "\e[1;31m$1 ERROR:\e[21m"; shift
+	echo -en "\e[1;31m$1 ERROR:\e[21m"
+	shift
 	echo -e " Missing dependency $*\e[39m"
 
 	install-if-possible "$*"
@@ -46,8 +48,9 @@ function cl-error {
 	[[ ${QUIT} != "" ]] && exit "$QUIT"
 }
 
-function cl-warning {
-	echo -en "\e[1;33m$1 WARN:\e[21m"; shift
+function cl-warning() {
+	echo -en "\e[1;33m$1 WARN:\e[21m"
+	shift
 	echo -e " Missing optional dependency $*\e[39m"
 
 	install-if-possible "$*"

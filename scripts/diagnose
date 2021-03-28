@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 announce "RAM usage: $ free -h"
 free -h

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 . cl-depend announce "packager-pip"
 . cl-depend announce-menu "packager-pip"

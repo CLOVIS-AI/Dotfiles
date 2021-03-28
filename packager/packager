@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # 'Packager' is a wrapper around many tools that are able to install/upgrade packages.
@@ -39,17 +39,15 @@
 # You can implement any other command you'd like, if needed. Wrappers are allowed to add their own interactive processes (eg. to ask for confirmation...). For example, it is possible to have a wrapper that asks the user whether 'sudo' should be used or not.
 #
 
-if [[ $1 == "complete" ]]
-then
-    complete -W "install help upgrade search remove v" packager
-    return
+if [[ $1 == "complete" ]]; then
+	complete -W "install help upgrade search remove v" packager
+	return
 fi
 
 # ============================================= H E L P =============================================== #
 
-if [[ $1 == "help" || $1 == "--help" ]]
-then
-    cat <<EOF
+if [[ $1 == "help" || $1 == "--help" ]]; then
+	cat <<EOF
 packager - Created by Ivan Canet
 
 Description:
@@ -79,20 +77,19 @@ Commands:
     p,  purge       Same as 'remove'.
 Any other command will be passed to the backend.
 EOF
-    exit 0
+	exit 0
 fi
 
 # ======================================== V E R B O S I T Y ========================================== #
 
 VERBOSE=0
-if [[ $1 == "v" || $1 == "-v" ]]
-then
-    VERBOSE=1
-    shift
+if [[ $1 == "v" || $1 == "-v" ]]; then
+	VERBOSE=1
+	shift
 fi
 
-function debug {
-    [[ $VERBOSE = 1 ]] && echo "debug: $*"
+function debug() {
+	[[ $VERBOSE == 1 ]] && echo "debug: $*"
 }
 
 # ========================================== L O A D I N G ============================================ #
@@ -106,24 +103,22 @@ debug "All dependencies checked."
 
 # ============================================ E X E C ================================================ #
 
-function find-tools {
-    for tool in $(compgen -A command "packager-") $(compgen -A function "packager-")
-    do
-        debug "Tool $tool found."
-        if $tool enabled >/dev/null
-        then
-            debug "Tool $tool is enabled."
-            TOOLS+=("${tool/packager-/}:$($tool name)")
-        else
-            debug "Tool $tool is disabled (if this is abnormal, run '$tool enabled' to get more information.)."
-        fi
-    done
+function find-tools() {
+	for tool in $(compgen -A command "packager-") $(compgen -A function "packager-"); do
+		debug "Tool $tool found."
+		if $tool enabled >/dev/null; then
+			debug "Tool $tool is enabled."
+			TOOLS+=("${tool/packager-/}:$($tool name)")
+		else
+			debug "Tool $tool is disabled (if this is abnormal, run '$tool enabled' to get more information.)."
+		fi
+	done
 }
 
-function select-tool {
+function select-tool() {
 	announce-menu --title "Choose your tool:" "${TOOLS[@]}"
 	TOOL="packager-$(announce-menu-get)"
-    debug "Selected tool: '$TOOL'."
+	debug "Selected tool: '$TOOL'."
 }
 
 declare -a TOOLS
@@ -132,45 +127,46 @@ find-tools
 if [[ $1 == "--tool" ]]; then
 	. cl-depend "$2" "packager"
 	TOOL="$2"
-	shift; shift
+	shift
+	shift
 else
 	select-tool
 fi
 
-function find-command {
-    case $1 in
-    install|i)
-        COMMAND=install
-        ;;
-    upgrade|u)
-        COMMAND=upgrade
-        ;;
-    search|s)
-        COMMAND=search
-        ;;
-    remove|r|purge|p)
-    	announce-menu --title "Are you sure you want to completely remove the packages?" \
-    		"yes:Yes, delete everything, including uneeded dependencies and configuration." \
-    		"keep:No, remove the packages but keep the dependencies and configuration." \
-    		"no:No, don't do anything."
-        case $(announce-menu-get) in
-        yes)
-            COMMAND=purge
-            ;;
-    	keep)
-            COMMAND=remove
-            ;;
-        no)
-            announce "Stopping."
-            exit 0
-            ;;
-        esac
-        ;;
-    *)
-        announce "Unknown command '$1', passing it anyway."
-        COMMAND="$1"
-        ;;
-    esac
+function find-command() {
+	case $1 in
+	install | i)
+		COMMAND=install
+		;;
+	upgrade | u)
+		COMMAND=upgrade
+		;;
+	search | s)
+		COMMAND=search
+		;;
+	remove | r | purge | p)
+		announce-menu --title "Are you sure you want to completely remove the packages?" \
+			"yes:Yes, delete everything, including uneeded dependencies and configuration." \
+			"keep:No, remove the packages but keep the dependencies and configuration." \
+			"no:No, don't do anything."
+		case $(announce-menu-get) in
+		yes)
+			COMMAND=purge
+			;;
+		keep)
+			COMMAND=remove
+			;;
+		no)
+			announce "Stopping."
+			exit 0
+			;;
+		esac
+		;;
+	*)
+		announce "Unknown command '$1', passing it anyway."
+		COMMAND="$1"
+		;;
+	esac
 }
 
 find-command $1

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 . cl-depend announce "git ci"
 . cl-depend announce-menu "git ci"

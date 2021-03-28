@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 . cl-depend announce "packager-yay"
 . cl-depend announce-menu "packager-yay"

@@ -1,41 +1,43 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 case $1 in
 enabled)
-    hash aptitude 2>/dev/null || (echo "'aptitude' is not installed."; exit 1)
-    ;;
+	hash aptitude 2>/dev/null || (
+		echo "'aptitude' is not installed."
+		exit 1
+	)
+	;;
 name)
-    echo -n "Modern Debian package manager"
-    ;;
+	echo -n "Modern Debian package manager"
+	;;
 install)
-    shift
-    announce sudo "aptitude install $*"
-    ;;
+	shift
+	announce sudo "aptitude install $*"
+	;;
 upgrade)
-    shift
-    if [[ $# = 0 ]]
-    then
-        announce sudo "aptitude update"
-        announce sudo "aptitude safe-upgrade"
-    else
-        announce "Cannot upgrade only selected packages."
-        exit 1
-    fi
-    ;;
+	shift
+	if [[ $# == 0 ]]; then
+		announce sudo "aptitude update"
+		announce sudo "aptitude safe-upgrade"
+	else
+		announce "Cannot upgrade only selected packages."
+		exit 1
+	fi
+	;;
 purge)
-    shift
-    announce sudo "aptitude purge $*"
-    ;;
+	shift
+	announce sudo "aptitude purge $*"
+	;;
 remove)
-    shift
-    announce sudo "aptitude remove $*"
-    ;;
+	shift
+	announce sudo "aptitude remove $*"
+	;;
 search)
-    shift
-    announce run "aptitude search $*"
-    ;;
+	shift
+	announce run "aptitude search $*"
+	;;
 *)
-    announce "Invalid command '$1'."
-    exit 2
-    ;;
+	announce "Invalid command '$1'."
+	exit 2
+	;;
 esac

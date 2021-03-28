@@ -1,43 +1,48 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 case $1 in
 enabled)
-    hash apt       2>/dev/null || (echo "'apt' is not installed."; exit 1)
-    hash apt-cache 2>/dev/null || (echo "'apt-cache' is not installed."; exit 1)
-    ;;
+	hash apt 2>/dev/null || (
+		echo "'apt' is not installed."
+		exit 1
+	)
+	hash apt-cache 2>/dev/null || (
+		echo "'apt-cache' is not installed."
+		exit 1
+	)
+	;;
 name)
-    echo -en "Old Debian package manager. Consider using 'aptitude' instead: https://askubuntu.com/a/1749/871815"
-    ;;
+	echo -en "Old Debian package manager. Consider using 'aptitude' instead: https://askubuntu.com/a/1749/871815"
+	;;
 install)
-    shift
-    announce sudo "apt install $*"
-    ;;
+	shift
+	announce sudo "apt install $*"
+	;;
 upgrade)
-    shift
-    if [[ $# = 0 ]]
-    then
-        announce sudo "apt update"
-        announce sudo "apt --with-new-pkgs --autoremove upgrade"
-    else
-        announce sudo "apt install --only-upgrade $*"
-    fi
-    ;;
+	shift
+	if [[ $# == 0 ]]; then
+		announce sudo "apt update"
+		announce sudo "apt --with-new-pkgs --autoremove upgrade"
+	else
+		announce sudo "apt install --only-upgrade $*"
+	fi
+	;;
 purge)
-    shift
-    announce sudo "apt remove --purge $*"
-    announce sudo "apt autoremove --purge"
-    ;;
+	shift
+	announce sudo "apt remove --purge $*"
+	announce sudo "apt autoremove --purge"
+	;;
 remove)
-    shift
-    announce sudo "apt remove $*"
-    announce sudo "apt autoremove"
-    ;;
+	shift
+	announce sudo "apt remove $*"
+	announce sudo "apt autoremove"
+	;;
 search)
-    shift
-    announce run "apt-cache search $*"
-    ;;
+	shift
+	announce run "apt-cache search $*"
+	;;
 *)
-    announce "Invalid command '$1'."
-    exit 2
-    ;;
+	announce "Invalid command '$1'."
+	exit 2
+	;;
 esac

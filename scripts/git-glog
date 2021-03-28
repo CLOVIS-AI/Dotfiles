@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 git log \
-    --color \
-    --graph \
-    --pretty=tformat:'%Cgreen%h ->%C(yellow)③%d%Creset %s %n%Creset%cr③     %Cresetby %C(bold blue)%an %CredSIG:%G?%GS%Creset' \
-    --abbrev-commit \
-    $* \
-	| sed -f ${CLOVIS_CONFIG:-$HOME/config}/sed-git-log.sed \
-	| column -t -s '③' \
-	| less -rFX
+	--color \
+	--graph \
+	--pretty=tformat:'%Cgreen%h ->%C(yellow)③%d%Creset %s %n%Creset%cr③     %Cresetby %C(bold blue)%an %CredSIG:%G?%GS%Creset' \
+	--abbrev-commit \
+	$* |
+	sed -f ${CLOVIS_CONFIG:-$HOME/config}/sed-git-log.sed |
+	column -t -s '③' |
+	less -rFX

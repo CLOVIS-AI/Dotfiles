@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 . cl-depend sshfs "cl-sync"
 . cl-depend fusermount3 "cl-sync"
 . cl-depend unison "cl-sync"
 
 function help() {
-    cat <<EOL
+	cat <<EOL
 cl-sync - by Ivan Canet
 
 Description:
