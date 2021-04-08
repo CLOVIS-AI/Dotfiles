@@ -10,7 +10,7 @@ flavor=$1
 build_dir="cmake-build-$flavor"
 shift
 
-if [[ ! -f $build_dir ]]; then
+if [[ ! -d $build_dir ]]; then
 	mkdir -p "$build_dir"
 	announce run cmake -B "$build_dir" -DCMAKE_BUILD_TYPE="$flavor"
 fi
