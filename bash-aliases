@@ -17,3 +17,7 @@ alias egrep='egrep --color=auto'
 
 # git
 alias g='git'
+
+# cmake
+alias cmk='cmake-utils debug'
+alias cmkr='cmake-utils release'
