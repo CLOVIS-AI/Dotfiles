@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [[ $# -lt 2 ]]; then
+	announce "You should provide at least a build flavor and a target:"
+	echo "cmake-utils <flavor> <target1> <target2> <…>"
+	exit
+fi
+
+flavor=$1
+build_dir="cmake-build-$flavor"
+shift
+
+if [[ ! -f $build_dir ]]; then
+	mkdir -p "$build_dir"
+	announce run cmake -B "$build_dir" -DCMAKE_BUILD_TYPE="$flavor"
+fi
+
+announce run make -j -s -C "$build_dir" "$@"
