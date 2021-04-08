@@ -14,3 +14,6 @@ alias edit='emacs -nw'
 # grep
 alias grep='grep --color=auto'
 alias egrep='egrep --color=auto'
+
+# git
+alias g='git'
