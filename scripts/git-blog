@@ -33,4 +33,4 @@ function work() {
 	done
 }
 
-git rev-list --parents "${@-HEAD}" --abbrev-commit | work
+git rev-list --parents "${@-HEAD}" | work
