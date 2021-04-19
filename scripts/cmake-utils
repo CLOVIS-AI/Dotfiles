@@ -7,7 +7,7 @@ if [[ $# -lt 2 ]]; then
 fi
 
 flavor=$1
-build_dir="cmake-build-$flavor"
+build_dir="cmake-build-$(<<<$flavor tr '[:upper:]' '[:lower:]')"
 shift
 
 if [[ ! -d $build_dir ]]; then
