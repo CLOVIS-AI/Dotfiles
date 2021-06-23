@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+while true; do
+	clear
+
+	announce "Nodes"
+	docker node ls
+
+	announce -n "Services"
+	docker service ls
+
+	services=$(docker service ls | tail -1 | tr -s ' ' | cut -d ' ' -f 2)
+	for service in $services; do
+		announce -n "Service $service"
+		docker service ps $service
+	done
+
+	sleep 10
+done
