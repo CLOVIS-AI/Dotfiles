@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Usage:
+# pdf-reduce <the-file.pdf>
+
+. cl-depend announce "pdf-reduce"
+. cl-depend gs "pdf-reduce"
+
+for e in "screen" "ebook" "prepress" "printer" "default"; do
+	announce run gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS=/$e -dNOPAUSE -dQUIET -dBATCH -sOutputFile=$1-$e $1
+done
