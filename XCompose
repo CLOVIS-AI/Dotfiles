@@ -1,3 +1,6 @@
+# Include all default sequences
+include "%L"
+
 #
 # This file is inspired from /usr/share/X11/locale/en_US.UTF-8/Compose
 # I modified a lot of it.
