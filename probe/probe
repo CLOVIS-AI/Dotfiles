@@ -53,16 +53,29 @@ function net_scan() {
 	announce sudo iftop -i "$interface" -F "$address" -m "$throughput"
 }
 
+# ==================== Logins scan =======================================
+
+function login_scan() {
+	</var/log/auth.log grep -a \
+		-e "unlocked login keyring" \
+		-e "ssh" \
+		-e "sudo:.*COMMAND="
+}
+
 # ==================== MAIN MENU =========================================
 
 announce-menu --title "Welcome to Probe. What do you want to do?" \
-	"scan-ip:Find other connected machines" \
-	"scan-network:Display the network usage (requires root access)"
+	"ip:Find other connected machines" \
+	"network-traffic:Display the network usage (requires root access)" \
+	"logins:Scan recent logins"
 case $(announce-menu-get) in
-scan-ip)
+ip)
 	ip_scan
 	;;
-scan-network)
+network-traffic)
 	net_scan
+	;;
+logins)
+	login_scan
 	;;
 esac
