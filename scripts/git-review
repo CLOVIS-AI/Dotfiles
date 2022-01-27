@@ -59,7 +59,7 @@ function do-diff-as-one() {
 	if announce-menu --chosen "yes"; then
 		echo "Accepted."
 	else
-		echo "Aborting..."
+		echo "Aborting…"
 		exit 0
 	fi
 }
@@ -70,7 +70,7 @@ function do-diff-one-by-one() {
 
 		announce-menu --title "Accept $COMMIT?" "yes" "no"
 		if announce-menu --chosen "no"; then
-			echo "Aborting..."
+			echo "Aborting…"
 			exit 0
 		fi
 	done
@@ -84,7 +84,7 @@ function do-diff() {
 	COMMITNUMBER="$(wc <<<"$COMMITS" -w)"
 
 	if [[ $COMMITNUMBER -eq 0 ]]; then
-		announce "There is nothing in '$SOURCE_DISPLAY' than isn't in '$TARGET_DISPLAY', there is nothing to do."
+		announce "There is nothing in ‘$SOURCE_DISPLAY’ than isn't in ‘$TARGET_DISPLAY’, there is nothing to do."
 		exit 0
 	fi
 
@@ -219,7 +219,7 @@ function strat-local-remote() {
 }
 
 function strat-remote-local() {
-	announce-do git fetch "$SOURCE_REMOTE" --prune || announce "Could not fetch, continuing anyway..."
+	announce-do git fetch "$SOURCE_REMOTE" --prune || announce "Could not fetch, continuing anyway…"
 	do-diff
 	do-local-work --from-remote
 }
@@ -242,7 +242,7 @@ TARGET=$CHOICE
 TARGET_DISPLAY=$CHOICE_DISPLAY
 
 echo
-announce "Okay, I will take commits from '$SOURCE_DISPLAY' and put them in '$TARGET_DISPLAY'"
+announce "Okay, I will take commits from ‘$SOURCE_DISPLAY’ and put them in ‘$TARGET_DISPLAY’"
 if [[ $SOURCE_REMOTE == "" && $TARGET_REMOTE == "" ]]; then
 	strat-local-local
 elif [[ $SOURCE_REMOTE == "" && ! $TARGET_REMOTE == "" ]]; then
