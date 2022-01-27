@@ -41,7 +41,8 @@
 	cm = commit -m
 	ca = commit --amend
 	a = add
-	ap = add -p
+	ap = add --patch
+	ai = add --interactive
 	add-new-files = add --intent-to-add
 	anf = add --intent-to-add
 	f = fetch
