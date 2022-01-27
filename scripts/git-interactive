@@ -41,6 +41,7 @@ while true; do
 		"unstage:Remove changes from the next commit" \
 		"rollback:Destroy changes" \
 		"commit:Commit the selected changes" \
+		"sync:Get or send commits" \
 		"quit:Quit this program"
 	case $(announce-menu-get) in
 	show)
@@ -58,6 +59,8 @@ while true; do
 	commit)
 		echo
 		git ci;;
+	sync)
+		git review;;
 	quit)
 		exit 0;;
 	esac
