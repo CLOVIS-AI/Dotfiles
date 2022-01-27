@@ -84,7 +84,7 @@ function do-diff() {
 	COMMITNUMBER="$(wc <<<"$COMMITS" -w)"
 
 	if [[ $COMMITNUMBER -eq 0 ]]; then
-		announce "The two branches are identical, there is nothing to do."
+		announce "There is nothing in '$SOURCE_DISPLAY' than isn't in '$TARGET_DISPLAY', there is nothing to do."
 		exit 0
 	fi
 
