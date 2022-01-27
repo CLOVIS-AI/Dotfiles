@@ -3,7 +3,7 @@
 [core]
 	autocrlf = input
 	excludesfile = ~/config/gitignore
-	editor = emacs -nw
+	editor = nano
 [credential]
 	helper = cache --timeout 1200
 [rerere]
