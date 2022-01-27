@@ -1,0 +1,67 @@
+#!/bin/env bash
+
+. announce-menu --import
+
+function ui_header() {
+    clear
+    git autofetch
+
+    announce --no-newline-after "Interactive Git"
+    git status -sb
+
+    echo
+}
+
+function track_untracked() {
+	while true; do
+		ui_header
+
+		untracked=$(git ls-files --others --exclude-standard)
+		# shellcheck disable=SC2086
+		announce-menu --title "Which files do you want to track?" \
+			$untracked \
+			"done:Go back to the main screen"
+		choice=$(announce-menu-get)
+		case $choice in
+		done)
+			return;;
+		*)
+			announce run git add --intent-to-add "$choice";;
+		esac
+	done
+}
+
+while true; do
+	ui_header
+
+	announce-menu --question "What now?" \
+		"show:Show what will be committed" \
+		"track:Start tracking new files (files in ??)" \
+		"stage:Add changes to the next commit" \
+		"unstage:Remove changes from the next commit" \
+		"rollback:Destroy changes" \
+		"commit:Commit the selected changes" \
+		"quit:Quit this program"
+	case $(announce-menu-get) in
+	show)
+		announce run git diff --cached;;
+	stage)
+		announce run git add --patch;;
+	unstage)
+		announce run git restore --staged --patch;;
+	rollback)
+		announce run git restore --patch;;
+	track)
+		track_untracked;;
+	status)
+		git status;;
+	commit)
+		echo
+		git ci;;
+	quit)
+		exit 0;;
+	esac
+
+	echo "Press ENTER to continue."
+	read -r
+done
