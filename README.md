@@ -10,7 +10,7 @@ You can find a non-exhaustive list of added commands for Git [here](git-aliases.
 By default, this repository expects to be cloned in `~/config`.
 
 ```shell
-git clone git@gitlab.com:clovis-ai/dotfiles.git ~/config
+git clone https://gitlab.com/clovis-ai/dotfiles.git ~/config
 ```
 
 If you want to clone it elsewhere, you can set the following environment variable (if you decide to do so, do replace the path in all other examples in this file as well):
