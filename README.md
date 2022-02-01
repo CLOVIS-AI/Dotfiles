@@ -21,27 +21,27 @@ The configuration is done via the `selector` script, either `selector.sh` for Ba
 
 This guide assumes you want to activate *everything* this project brings. If you don't (eg. you don't want the prompts), run the following commands to see what the options are:
 
-    . ~/config/selector.sh --help
+    source ~/config/selector.sh --help
 
 If you will only use the project the 'easy way' (not via SSH, and without calling programs from outside the shell), you can init it like this:
 
     # If you use Bash, in ~/.bashrc
-    . ~/config/selector.sh
+    source ~/config/selector.sh
 
     # If you use Zsh, in ~/.zshrc
-    . ~/config/selector.zsh
+    source ~/config/selector.zsh
 
 If you intend to use these tools via SSH or other systems, you will need to differentiate between login shells and regular shells:
 
     # Bash: in ~/.bash_profile
-    . ~/config/selector.sh --env-shell
+    source ~/config/selector.sh --env-shell
     # Bash: in ~/.bashrc
-    . ~/config/selector.sh --no-env
+    source ~/config/selector.sh --no-env
     
     # Zsh: in ~/.zshenv
-    . ~/config/selector.zsh --env-shell
+    source ~/config/selector.zsh --env-shell
     # Zsh: in ~/.zshrc
-    . ~/config/selector.zsh --no-env
+    source ~/config/selector.zsh --no-env
 
 ### Git
 
