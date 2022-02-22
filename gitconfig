@@ -57,7 +57,8 @@
 	bdrra = "!f() { b=$1; announce \"Deleting local branch $1\"; git bd $1; git bdrr $1; }; f"
 	bla = branch -vva
 	d = diff --submodule=diff
-	dc = diff --cached --submodule=diff
+	dc = diff --staged --submodule=diff
+	ds = diff --staged --submodule=diff
 	s = show --show-signature
 	unstage = restore --staged
 	get-stage = restore --worktree
