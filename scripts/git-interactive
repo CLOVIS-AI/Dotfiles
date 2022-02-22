@@ -39,6 +39,7 @@ while true; do
 		"track:Start tracking new files (files in ??)" \
 		"stage:Add changes to the next commit" \
 		"unstage:Remove changes from the next commit" \
+		"get-stage:Remove local changes that haven't been staged" \
 		"rollback:Destroy changes" \
 		"commit:Commit the selected changes" \
 		"sync:Get or send commits" \
@@ -50,8 +51,10 @@ while true; do
 		announce run git add --patch;;
 	unstage)
 		announce run git restore --staged --patch;;
+	get-stage)
+		announce run git restore --worktree --patch;;
 	rollback)
-		announce run git restore --patch;;
+		announce run git restore --worktree --staged --patch;;
 	track)
 		track_untracked;;
 	status)
