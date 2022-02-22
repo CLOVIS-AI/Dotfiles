@@ -59,6 +59,9 @@
 	d = diff --submodule=diff
 	dc = diff --cached --submodule=diff
 	s = show --show-signature
+	unstage = restore --staged
+	get-stage = restore --worktree
+	rollback = restore --worktree --staged
 	authors = shortlog -sn --no-merges
 	committers = shortlog -esnc --no-merges
 	tags = tag --list --sort=-committerdate -n1
