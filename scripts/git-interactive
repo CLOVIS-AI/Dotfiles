@@ -40,7 +40,8 @@ while true; do
 		"stage:Add changes to the next commit" \
 		"unstage:Remove changes from the next commit" \
 		"get-stage:Remove local changes that haven't been staged" \
-		"rollback:Destroy changes" \
+		"rollback:Destroy changes from the work tree" \
+		"full-rollback:Destroy changes from the work tree and the stage" \
 		"commit:Commit the selected changes" \
 		"sync:Get or send commits" \
 		"quit:Quit this program"
@@ -54,6 +55,8 @@ while true; do
 	get-stage)
 		announce run git restore --worktree --patch;;
 	rollback)
+		announce run git restore --worktree --source HEAD --patch;;
+	full-rollback)
 		announce run git restore --worktree --staged --patch;;
 	track)
 		track_untracked;;
