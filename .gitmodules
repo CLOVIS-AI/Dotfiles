@@ -1,0 +1,3 @@
+[submodule "opensavvy"]
+	path = opensavvy
+	url = https://gitlab.com/opensavvy/dotfiles.git

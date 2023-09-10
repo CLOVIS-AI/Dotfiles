@@ -25,8 +25,9 @@ Options:
     --no-completion         Do not add bash completion
     --no-autofetch          Do not auto-fetch git repositories
     --no-autofetch-config   Do not auto-fetch the configuration repository
-    --env-shell				Specify session-wide values (PATH...)
-    --no-env				Specify everything that is NOT specified in --env-shell
+    --env-shell             Specify session-wide values (PATH...)
+    --no-env                Specify everything that is NOT specified in --env-shell
+    --no-opensavvy          Do not enable the OpenSavvy dotfiles (required by Packager)
 
 Environment variables:
     CLOVIS_CONFIG_ALIASES   Source the Bash aliases (default: yes)
@@ -37,6 +38,7 @@ Environment variables:
     CLOVIS_CONFIG_COMPLETE  Sets up bash completion (default: yes)
     CLOVIS_CONFIG_AUTOFETCH Autofetches git repositories when entering them (default: yes)
     CLOVIS_CONFIG_AFCONFIG  Autofetches the configuration repository (default: yes)
+    CLOVIS_CONFIG_OPENSAVVY Enables the OpenSavvy dotfiles (required for Packager, default: yes)
 EOF
 fi
 
@@ -80,6 +82,10 @@ while [[ $# -gt 0 ]]; do
 	--no-autofetch-config)
 		CLOVIS_CONFIG_AFCONFIG=no
 		;;
+	--no-opensavvy)
+		CLOVIS_CONFIG_OPENSAVVY=no
+		CLOVIS_CONFIG_PACKAGER=no
+		;;
 	--env-shell)
 		CLOVIS_CONFIG_ALIASES=no
 		CLOVIS_CONFIG_PROMPT=no
@@ -89,6 +95,7 @@ while [[ $# -gt 0 ]]; do
 		CLOVIS_CONFIG_AUTOFETCH=no
 		CLOVIS_CONFIG_AFCONFIG=no
 		CLOVIS_CONFIG_COMPLETE=no
+		CLOVIS_CONFIG_OPENSAVVY=yes
 		;;
 	--no-env)
 		CLOVIS_CONFIG_ALIASES=yes
@@ -99,6 +106,7 @@ while [[ $# -gt 0 ]]; do
 		CLOVIS_CONFIG_AUTOFETCH=yes
 		CLOVIS_CONFIG_AFCONFIG=yes
 		CLOVIS_CONFIG_COMPLETE=yes
+		CLOVIS_CONFIG_OPENSAVVY=no
 		;;
 	esac
 	shift
@@ -131,6 +139,19 @@ if [[ ${CLOVIS_CONFIG_SCRIPTS:-yes} == yes ]]; then
 	if [[ $PATH != *"$CLOVIS_CONFIG/scripts"* ]]; then
 		PATH="$PATH:$CLOVIS_CONFIG/scripts"
 	fi
+fi
+
+if [[ ${CLOVIS_CONFIG_OPENSAVVY:-yes} == yes ]]; then
+	debug "Configuring the OpenSavvy Dotfiles..."
+
+	here=$(pwd)
+	cd "$CLOVIS_CONFIG/opensavvy"
+	if [ -n "$ZSH_VERSION" ]; then
+	  source ./os_configure.zsh
+	else
+	  source ./os_configure.bash
+	fi
+	cd "$here"
 fi
 
 if [[ ${CLOVIS_CONFIG_PACKAGER:-yes} == yes ]]; then
