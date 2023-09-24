@@ -1,16 +1,15 @@
-FROM alpine:latest
+FROM archlinux:latest
 
-RUN apk add --no-cache \
-	git openssh curl zip unzip which bash \
-	openjdk11
+RUN pacman -Syuu --noconfirm jre-openjdk-headless kotlin git openssh curl zsh
+ENTRYPOINT [ "/bin/zsh" ]
 
-SHELL ["/bin/bash", "-c"]
-
-# Copying this repo to the Docker image.
 COPY . /root/config
 
-# Add the scripts to the PATH.
-ENV PATH /root/config/scripts:$PATH
+WORKDIR /root
+RUN echo "source /root/config/selector.sh --env-shell" >>.bash_profile
+RUN echo "source /root/config/selector.sh --no-env" >>.bashrc
+RUN echo "source /root/config/selector.zsh --env-shell" >>.zshenv
+RUN echo "source /root/config/selector.zsh --no-env" >>.zshrc
 
-# Install kscript via SDKMAN
-RUN ensure_kscript 'println("kscript runs!")'
+RUN echo "[include]" >>.gitconfig
+RUN echo "	path = /root/config/gitconfig" >>.gitconfig
