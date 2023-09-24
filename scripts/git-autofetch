@@ -46,7 +46,7 @@ if [[ $changelog_this_time == "true" ]]; then
 	git-data --remote-branch-exists "$tracked" || exit 0
 	COMMITS=$(git log .."$tracked")
 	if [[ "$COMMITS" != "" ]]; then
-		git-changelog .."$tracked"
+		git changelog .."$tracked"
 		rm -f "$changelog_next_time"
 	fi
 fi
