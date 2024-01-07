@@ -158,7 +158,7 @@ if [[ ${CLOVIS_CONFIG_PACKAGER:-yes} == yes ]]; then
 	debug "Adding the packager system to the PATH variable..."
 
 	if [[ $PATH != *"$CLOVIS_CONFIG/packager"* ]]; then
-		PATH="$PATH:$CLOVIS_CONFIG/packager"
+		PATH="$PATH:$CLOVIS_CONFIG/packager/src"
 	fi
 fi
 
