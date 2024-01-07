@@ -1,6 +1,6 @@
 FROM archlinux:latest
 
-RUN pacman -Syuu --noconfirm jre-openjdk-headless kotlin git openssh curl zsh
+RUN pacman -Syuu --noconfirm jre-openjdk kotlin git openssh curl zsh
 ENTRYPOINT [ "/bin/zsh" ]
 
 COPY . /root/config
