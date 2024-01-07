@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-if [[ $# != 1 ]]; then
-	echo "Expecting one parameter: the number of commits to delete."
-fi
-
-git reset --soft HEAD~$1

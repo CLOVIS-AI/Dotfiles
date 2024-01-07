@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-cat ${CLOVIS_CONFIG:-$HOME/config}/compose-keys.txt
