@@ -1,6 +1,6 @@
 [submodule "opensavvy"]
 	path = opensavvy
-	url = https://gitlab.com/opensavvy/dotfiles.git
+	url = https://gitlab.com/opensavvy/system/dotfiles.git
 [submodule "packager"]
 	path = packager
-	url = https://gitlab.com/opensavvy/packager.git
+	url = https://gitlab.com/opensavvy/system/packager.git
