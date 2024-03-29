@@ -21,3 +21,6 @@ alias g='git'
 # cmake
 alias cmk='cmake-utils Debug'
 alias cmkr='cmake-utils Release'
+
+# dotfiles
+alias dotfiles='/usr/bin/git --git-dir="$HOME/.dotfiles" --work-tree="$HOME"'
