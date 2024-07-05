@@ -55,10 +55,12 @@ include "%L"
 <Multi_key> <g> <Z>            : "Ζ"   U0396    # GREEK CAPITAL LETTER ZETA
 <Multi_key> <g> <z>            : "ζ"   U03B6    # GREEK SMALL LETTER ZETA
 
+<Multi_key> <less> <exclam> <greater> :   "⚠" U26A0  # WARNING SIGN
 
 
 
-
+# To figure out how to refer to a character, use:
+#    xev | grep keycode
 
 
 
