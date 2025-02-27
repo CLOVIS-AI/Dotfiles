@@ -1,5 +1,5 @@
 [include]
-    path = ~/config/opensavvy/git/config
+	path = ~/config/opensavvy/git/gitconfig
 [gpg]
 	program = /usr/bin/gpg
 [core]
@@ -10,6 +10,7 @@
 	helper = cache --timeout 1200
 [rerere]
 	enabled = true
+	autoupdate = true
 [pull]
 	rebase = true
 [fetch]
@@ -20,9 +21,9 @@
 	recurseSubmodules = check
 [diff]
 	algorithm = histogram
+	colorMoved = dimmed-zebra
 [rebase]
-	autoStash = true
-	missingCommitsCheck = error
+	rebaseMerges = no-rebase-cousins
 [alias]
 	unpushed = !git changelog "$(git data --tracked).."
 	unpulled = !git changelog "..$(git data --tracked)"
